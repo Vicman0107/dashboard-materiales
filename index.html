@@ -6,382 +6,587 @@
 <title>EDESUR — Inventario de Materiales</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 :root{
-  --navy:#0D2B5E;--navy2:#1A3A6E;--orange:#E8580A;
+  --navy:#0D2B5E;--orange:#E8580A;
   --red:#DC2626;--rbg:#FEF2F2;--rbd:#FECACA;
   --yel:#D97706;--ybg:#FFFBEB;--ybd:#FDE68A;
   --grn:#16A34A;--gbg:#F0FDF4;--gbd:#BBF7D0;
   --blu:#2563EB;--bbg:#EFF6FF;--bbd:#BFDBFE;
-  --bg:#F7F8FA;--srf:#fff;--brd:#E5E7EB;
-  --tx:#111827;--mx:#6B7280;--lx:#9CA3AF;
-  --mono:'JetBrains Mono',monospace;
+  --bg:#F1F3F7;--srf:#fff;--brd:#E2E5EB;
+  --tx:#0F172A;--mx:#64748B;--lx:#94A3B8;
+  --mono:'DM Mono',monospace;--sb:224px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
-
-.hdr{background:var(--navy);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.08)}
-.hdr-l{display:flex;align-items:center;gap:10px}
-.logo{width:28px;height:28px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11px;color:#fff;letter-spacing:.3px}
-.hdr-title{color:#fff;font-size:14px;font-weight:500;letter-spacing:-.1px}
-.hdr-sub{color:rgba(255,255,255,.4);font-size:12px;margin-left:4px}
-.hdr-r{display:flex;align-items:center;gap:12px}
-.upd-badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;padding:4px 10px;border-radius:20px;font-family:var(--mono)}
-.up-btn{background:var(--orange);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s}
-.up-btn:hover{opacity:.85}
-.up-panel{position:absolute;right:24px;top:64px;background:var(--srf);border:1px solid var(--brd);border-radius:10px;padding:16px;width:270px;box-shadow:0 8px 24px rgba(0,0,0,.1);display:none;z-index:200}
-.up-panel.open{display:block}
-.up-panel h4{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
-.up-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.up-lbl{font-size:12px;color:var(--tx);width:72px;flex-shrink:0}
-.up-inp{flex:1;border:1px solid var(--brd);border-radius:6px;padding:5px 8px;font-size:11px;font-family:inherit;background:var(--bg);cursor:pointer;color:var(--tx)}
-.up-note{font-size:11px;color:var(--mx);margin-top:8px;line-height:1.5;padding:8px;background:var(--bg);border-radius:6px}
-
-.main{padding:20px 24px;max-width:1440px;margin:0 auto}
-
-.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:18px;padding:10px 14px;background:var(--srf);border:1px solid var(--brd);border-radius:8px}
-.f-lbl{font-size:11px;font-weight:600;color:var(--lx);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;margin-right:4px}
-.f-sel{border:1px solid var(--brd);border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;color:var(--tx);background:var(--srf);cursor:pointer;outline:none}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;display:flex;min-height:100vh}
+.sb{width:var(--sb);min-height:100vh;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-brand{display:flex;align-items:center;gap:10px}
+.sb-icon{width:32px;height:32px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;flex-shrink:0}
+.sb-title{color:#fff;font-size:13px;font-weight:600;line-height:1.3}
+.sb-sub{color:rgba(255,255,255,.35);font-size:10px;margin-top:1px}
+.sb-date{margin:10px 20px 0;padding:7px 10px;background:rgba(255,255,255,.05);border-radius:6px;font-size:10px;color:rgba(255,255,255,.35);font-family:var(--mono)}
+.sb-nav{padding:14px 10px;flex:1}
+.sb-sec{font-size:10px;font-weight:600;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:.8px;padding:0 10px;margin:14px 0 5px}
+.sb-sec:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.5);font-size:12px;transition:all .15s;position:relative;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8)}
+.nav-item.active{background:rgba(255,255,255,.11);color:#fff;font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--orange);border-radius:0 3px 3px 0}
+.nav-icon{width:15px;height:15px;flex-shrink:0;opacity:.6}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;font-family:var(--mono)}
+.nav-badge.yel{background:var(--yel)}
+.sb-footer{padding:12px 20px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:rgba(255,255,255,.2);line-height:1.5}
+.main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--srf);border-bottom:1px solid var(--brd);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.tb-title{font-size:14px;font-weight:600}
+.tb-sub{font-size:11px;color:var(--lx)}
+.content{padding:22px 28px;flex:1}
+.tab-page{display:none}.tab-page.active{display:block}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-grid.c3{grid-template-columns:repeat(3,1fr)}
+.kpi-grid.c2{grid-template-columns:repeat(2,1fr)}
+.kpi{background:var(--srf);border:1px solid var(--brd);border-radius:12px;padding:15px 17px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--navy));border-radius:12px 0 0 12px}
+.kpi.red{--ac:var(--red)}.kpi.yel{--ac:var(--yel)}.kpi.grn{--ac:var(--grn)}.kpi.blu{--ac:var(--blu)}
+.kpi-lbl{font-size:11px;font-weight:500;color:var(--mx);margin-bottom:5px}
+.kpi-val{font-size:22px;font-weight:600;font-family:var(--mono);letter-spacing:-.5px;line-height:1}
+.kpi.red .kpi-val{color:var(--red)}.kpi.yel .kpi-val{color:var(--yel)}.kpi.grn .kpi-val{color:var(--grn)}
+.kpi-sub{font-size:11px;color:var(--lx);margin-top:4px}
+.card{background:var(--srf);border:1px solid var(--brd);border-radius:12px;padding:16px 18px}
+.card-t{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-t span{font-weight:400;color:var(--lx);text-transform:none;letter-spacing:0;font-size:11px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:1100px){.row3{grid-template-columns:1fr 1fr}}
+.tw{background:var(--srf);border:1px solid var(--brd);border-radius:12px;overflow:hidden}
+.t-head{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd);gap:10px;flex-wrap:wrap}
+.t-title{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.t-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.f-sel{border:1px solid var(--brd);border-radius:7px;padding:5px 8px;font-size:12px;font-family:inherit;color:var(--tx);background:var(--bg);cursor:pointer;outline:none}
 .f-sel:focus{border-color:var(--navy)}
 .sw{position:relative}
-.f-srch{border:1px solid var(--brd);border-radius:6px;padding:5px 8px 5px 26px;font-size:12px;font-family:inherit;background:var(--srf);outline:none;width:180px;color:var(--tx)}
-.f-srch:focus{border-color:var(--navy)}
-.si{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--lx);font-size:12px;pointer-events:none}
-.clr-btn{background:none;border:1px solid var(--brd);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--mx);cursor:pointer;font-family:inherit;transition:.15s}
+.f-srch{border:1px solid var(--brd);border-radius:7px;padding:5px 8px 5px 26px;font-size:12px;font-family:inherit;background:var(--bg);outline:none;width:160px;color:var(--tx)}
+.si{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--lx);pointer-events:none}
+.clr-btn{background:none;border:1px solid var(--brd);border-radius:7px;padding:5px 10px;font-size:12px;color:var(--mx);cursor:pointer;font-family:inherit}
 .clr-btn:hover{border-color:var(--navy);color:var(--navy)}
-.f-cnt{margin-left:auto;font-size:12px;color:var(--mx)}
-
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--srf);border:1px solid var(--brd);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;transition:box-shadow .15s}
-.kpi:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.kpi::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--navy));border-radius:10px 0 0 10px}
-.kpi.red{--ac:var(--red)}.kpi.yel{--ac:var(--yel)}.kpi.grn{--ac:var(--grn)}.kpi.blu{--ac:var(--blu)}
-.kpi-lbl{font-size:10px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.kpi-val{font-size:22px;font-weight:600;color:var(--tx);line-height:1;font-family:var(--mono);letter-spacing:-.5px}
-.kpi-sub{font-size:11px;color:var(--lx);margin-top:4px}
-.kpi.red .kpi-val{color:var(--red)}.kpi.yel .kpi-val{color:var(--yel)}
-
-.sec-title{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
-.dot.yel{background:var(--yel)}.dot.grn{background:var(--grn)}.dot.blu{background:var(--blu)}
-
-.alerts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:20px}
-.alert-card{background:var(--rbg);border:1px solid var(--rbd);border-radius:8px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.alert-card.yel{background:var(--ybg);border-color:var(--ybd)}
-.ac-info{}
-.ac-cod{font-size:10px;color:var(--mx);font-family:var(--mono);margin-bottom:1px}
-.ac-desc{font-size:12px;font-weight:500;color:var(--tx);max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ac-meta{font-size:10px;color:var(--mx);margin-top:2px}
-.ac-dias{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--red);white-space:nowrap;flex-shrink:0}
-.ac-dias.yel{color:var(--yel)}
-.ac-dias small{font-size:10px;font-weight:400}
-
-.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
-@media(max-width:1100px){.charts-row{grid-template-columns:1fr 1fr}}
-@media(max-width:700px){.charts-row{grid-template-columns:1fr}}
-.card{background:var(--srf);border:1px solid var(--brd);border-radius:10px;padding:16px}
-.card-t{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
-.card-t span{font-weight:400;color:var(--lx);text-transform:none;letter-spacing:0;font-size:11px}
-.chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:11px;color:var(--mx)}
-.leg-item{display:flex;align-items:center;gap:4px}
-.leg-dot{width:8px;height:8px;border-radius:2px}
-
-.kit-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-@media(max-width:800px){.kit-row{grid-template-columns:1fr}}
-
-.kit-toggle{display:flex;gap:6px;margin-bottom:12px}
-.k-btn{border:1px solid var(--brd);background:var(--bg);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--mx);transition:.15s}
-.k-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-
-.tw{background:var(--srf);border:1px solid var(--brd);border-radius:10px;overflow:hidden}
-.th{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--brd)}
-.tt{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.5px}
-.e-btns{display:flex;gap:4px}
-.e-btn{border:1px solid var(--brd);background:var(--bg);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--mx);transition:.15s}
-.e-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.f-cnt{font-size:11px;color:var(--lx);white-space:nowrap}
+.e-btns{display:flex;gap:3px;flex-wrap:wrap}
+.e-btn{border:1px solid var(--brd);background:var(--bg);border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--mx);transition:.12s}
+.e-btn:hover,.e-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 .e-btn.ea{background:var(--red);color:#fff;border-color:var(--red)}
 .e-btn.eb{background:var(--yel);color:#fff;border-color:var(--yel)}
 .e-btn.en{background:var(--blu);color:#fff;border-color:var(--blu)}
 .e-btn.es{background:var(--grn);color:#fff;border-color:var(--grn)}
-.ts{overflow-x:auto;max-height:460px;overflow-y:auto}
+.ts{overflow-x:auto;max-height:500px;overflow-y:auto}
 table{width:100%;border-collapse:collapse}
-thead th{background:var(--bg);position:sticky;top:0;z-index:5;padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--brd);cursor:pointer;white-space:nowrap;user-select:none}
+thead th{background:var(--bg);position:sticky;top:0;z-index:5;padding:8px 11px;text-align:left;font-size:10px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--brd);cursor:pointer;white-space:nowrap;user-select:none}
 thead th:hover{color:var(--navy)}
-td{padding:8px 12px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+td{padding:7px 11px;border-bottom:1px solid #F1F3F7;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#F9FAFB}
+tr:hover td{background:#F8FAFC}
 .tcod{font-family:var(--mono);font-size:10px;color:var(--mx)}
-.tdesc{font-weight:500;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
-.tcat{font-size:10px;padding:2px 6px;border-radius:4px;background:var(--bg);color:var(--mx);border:1px solid var(--brd);white-space:nowrap}
+.tdesc{font-weight:500;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.tcat{font-size:10px;padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--mx);border:1px solid var(--brd);white-space:nowrap}
 .tn{text-align:right;font-family:var(--mono);font-size:11px}
-.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:12px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;white-space:nowrap}
 .badge.CRITICO{background:var(--rbg);color:var(--red);border:1px solid var(--rbd)}
 .badge.BAJO{background:var(--ybg);color:var(--yel);border:1px solid var(--ybd)}
 .badge.NORMAL{background:var(--bbg);color:var(--blu);border:1px solid var(--bbd)}
 .badge.SUFICIENTE{background:var(--gbg);color:var(--grn);border:1px solid var(--gbd)}
 .kit-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);display:inline-block;margin-right:3px;vertical-align:middle}
-.cov-wrap{display:flex;align-items:center;gap:6px}
-.cov-bar{height:4px;border-radius:2px;background:#E5E7EB;width:60px;overflow:hidden;flex-shrink:0}
+.cov-wrap{display:flex;align-items:center;gap:5px}
+.cov-bar{height:4px;border-radius:2px;background:#E2E8F0;width:50px;overflow:hidden;flex-shrink:0}
 .cov-fill{height:100%;border-radius:2px}
-.cov-val{font-family:var(--mono);font-size:10px;color:var(--mx);min-width:28px}
-
-.footer{text-align:center;padding:16px;font-size:11px;color:var(--lx);border-top:1px solid var(--brd);margin-top:8px}
+.cov-val{font-family:var(--mono);font-size:10px;min-width:36px}
+/* fuente badges */
+.src-badge{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:500;white-space:nowrap}
+.src-sap{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.src-chm{background:var(--gbg);color:#15803D;border:1px solid var(--gbd)}
+.src-both{background:#F5F3FF;color:#6D28D9;border:1px solid #DDD6FE}
+.src-none{background:#F8FAFC;color:var(--lx);border:1px solid var(--brd)}
+/* alertas */
+.alerts-list{display:flex;flex-direction:column;gap:6px}
+.alert-row{background:var(--srf);border:1px solid var(--brd);border-radius:10px;padding:11px 16px;display:flex;align-items:center;gap:14px}
+.alert-row.cr{border-left:3px solid var(--red);background:var(--rbg)}
+.alert-row.bj{border-left:3px solid var(--yel);background:var(--ybg)}
+.ar-cov{width:60px;flex-shrink:0;text-align:center}
+.ar-mes{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1}
+.ar-mes.cr{color:var(--red)}.ar-mes.bj{color:var(--yel)}
+.ar-mlbl{font-size:10px;color:var(--mx);margin-top:1px}
+.ar-info{flex:1;min-width:0}
+.ar-cod{font-size:10px;color:var(--mx);font-family:var(--mono)}
+.ar-desc{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-meta{font-size:11px;color:var(--mx);margin-top:2px}
+.ar-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+/* progress */
+.prog-row{display:flex;flex-direction:column;gap:8px}
+.prog-item{display:flex;align-items:center;gap:8px}
+.prog-lbl{font-size:11px;width:80px;flex-shrink:0}
+.prog-bar{flex:1;height:5px;background:#E2E8F0;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+.prog-val{font-family:var(--mono);font-size:11px;color:var(--mx);width:24px;text-align:right;flex-shrink:0}
+.kit-toggle{display:flex;gap:3px}
+.k-btn{border:1px solid var(--brd);background:var(--bg);border-radius:7px;padding:4px 11px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--mx);transition:.12s}
+.k-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sec-title{font-size:11px;font-weight:600;color:var(--mx);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
+.dot.yel{background:var(--yel)}.dot.grn{background:var(--grn)}.dot.blu{background:var(--blu)}
+.chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:11px;color:var(--mx)}
+.leg-item{display:flex;align-items:center;gap:4px}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* exec cat cards */
+.cat-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:1100px){.cat-cards{grid-template-columns:repeat(2,1fr)}}
+.cat-card{background:var(--srf);border:1px solid var(--brd);border-radius:12px;padding:14px 16px}
+.cat-card-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cat-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.cat-name{font-size:12px;font-weight:600}
+.cat-count{margin-left:auto;font-size:11px;color:var(--mx);font-family:var(--mono)}
+.cat-stats{display:flex;gap:10px;margin-bottom:10px}
+.cat-stat{flex:1;text-align:center}
+.cat-stat-val{font-size:16px;font-weight:600;font-family:var(--mono);line-height:1}
+.cat-stat-lbl{font-size:10px;color:var(--mx);margin-top:2px}
+.cat-mini-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px}
+.cat-mini-seg{height:100%;transition:width .3s}
 </style>
 </head>
 <body>
 
-<div class="hdr">
-  <div class="hdr-l">
-    <div class="logo">ED</div>
-    <span class="hdr-title">Inventario de Materiales</span>
-    <span class="hdr-sub">Dirección Comercial</span>
+<nav class="sb">
+  <div class="sb-logo">
+    <div class="sb-brand">
+      <div class="sb-icon">ED</div>
+      <div><div class="sb-title">Inventario</div><div class="sb-sub">Dirección Comercial</div></div>
+    </div>
+    <div class="sb-date" id="sb-date">...</div>
   </div>
-  <div class="hdr-r" style="position:relative">
-    <span class="upd-badge" id="upd-lbl">...</span>
-    <button class="up-btn" onclick="toggleUp()">Actualizar datos</button>
-    <div class="up-panel" id="fp">
-      <h4>Cargar archivos Excel</h4>
-      <div class="up-row"><span class="up-lbl">Stock SAP</span><input type="file" class="up-inp" accept=".xlsx,.xls"></div>
-      <div class="up-row"><span class="up-lbl">Stock CHM</span><input type="file" class="up-inp" accept=".xlsx,.xls"></div>
-      <div class="up-row"><span class="up-lbl">Consumo</span><input type="file" class="up-inp" accept=".xlsx,.xls"></div>
-      <div class="up-note">Sube los 3 archivos Excel, ejecuta el script Python para regenerar este dashboard con datos actualizados.</div>
+  <div class="sb-nav">
+    <div class="sb-sec">Principal</div>
+    <div class="nav-item active" onclick="goTab('kit',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+      Kit de Materiales
+      <span class="nav-badge" id="nb-kit">–</span>
+    </div>
+    <div class="nav-item" onclick="goTab('alertas',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L14 13H2L8 2Z"/><path d="M8 7v2.5M8 11v.5"/></svg>
+      Alertas Críticas
+      <span class="nav-badge" id="nb-alertas">–</span>
+    </div>
+    <div class="sb-sec">Inventario</div>
+    <div class="nav-item" onclick="goTab('stock',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h8"/></svg>
+      Stock General
+    </div>
+    <div class="sb-sec">Análisis</div>
+    <div class="nav-item" onclick="goTab('exec',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 10l2-3 2 2 2-4"/></svg>
+      Resumen Ejecutivo
     </div>
   </div>
-</div>
+  <div class="sb-footer">EDESUR Dominicana, S.A.<br>Gerencia de Servicios Técnicos</div>
+</nav>
 
 <div class="main">
-
-  <div class="filters">
-    <span class="f-lbl">Filtros</span>
-    <select class="f-sel" id="fc" onchange="applyF()"><option value="">Todas las categorías</option></select>
-    <select class="f-sel" id="fst" onchange="applyF()">
-      <option value="">Todos los estados</option>
-      <option value="CRITICO">Crítico</option>
-      <option value="BAJO">Bajo</option>
-      <option value="NORMAL">Normal</option>
-      <option value="SUFICIENTE">Suficiente</option>
-    </select>
-    <select class="f-sel" id="fkit" onchange="applyF()">
-      <option value="">Kit + Otros</option>
-      <option value="kit">Solo Kit</option>
-      <option value="otros">Solo Otros</option>
-    </select>
-    <div class="sw">
-      <span class="si">⌕</span>
-      <input type="text" class="f-srch" id="fsrch" placeholder="Buscar material..." oninput="applyF()">
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="tb-title">Kit de Materiales</div>
+      <div class="tb-sub" id="tb-sub"></div>
     </div>
-    <button class="clr-btn" onclick="clrF()">Limpiar</button>
-    <span class="f-cnt" id="fcnt"></span>
+    <span style="font-size:11px;color:var(--lx);font-family:var(--mono)" id="upd-lbl"></span>
   </div>
+  <div class="content">
 
-  <div class="kpis" id="kpis"></div>
-
-  <div id="kit-alerts-section"></div>
-
-  <div class="charts-row">
-    <div class="card">
-      <div class="card-t">Estado del inventario</div>
-      <div class="chart-legend" id="leg-estado"></div>
-      <div style="position:relative;height:180px"><canvas id="ce" role="img" aria-label="Gráfico de estado del inventario"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-t">Stock por categoría</div>
-      <div style="position:relative;height:200px"><canvas id="cc" role="img" aria-label="Stock por categoría"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-t">CHM por zona</div>
-      <div style="position:relative;height:200px"><canvas id="cz" role="img" aria-label="Stock CHM por zona"></canvas></div>
-    </div>
-  </div>
-
-  <div class="kit-row">
-    <div class="card">
-      <div class="card-t">
-        Cobertura del kit de materiales
-        <div class="kit-toggle" id="kit-toggle">
-          <button class="k-btn active" onclick="setKitView(this,'alerts')">Con alerta</button>
-          <button class="k-btn" onclick="setKitView(this,'all')">Ver todos (33)</button>
+    <!-- KIT -->
+    <div class="tab-page active" id="tab-kit">
+      <div class="kpi-grid" id="kpi-kit"></div>
+      <div class="row2">
+        <div class="card">
+          <div class="card-t">Cobertura por material
+            <div class="kit-toggle">
+              <button class="k-btn active" onclick="setKitView(this,'alerts')">Con alerta</button>
+              <button class="k-btn" onclick="setKitView(this,'all')">Ver todos</button>
+            </div>
+          </div>
+          <div style="position:relative" id="kit-chart-wrap"><canvas id="ckit"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-t">Distribución del kit</div>
+          <div class="chart-legend" id="leg-kit"></div>
+          <div style="position:relative;height:190px"><canvas id="ckit-pie"></canvas></div>
+          <div style="margin-top:14px" id="kit-progress"></div>
         </div>
       </div>
-      <div style="position:relative" id="kit-chart-wrap">
-        <canvas id="ckit" role="img" aria-label="Cobertura del kit de materiales"></canvas>
+      <div class="tw">
+        <div class="t-head">
+          <span class="t-title">Detalle — 33 materiales</span>
+          <div class="e-btns" id="ebtns-kit"></div>
+        </div>
+        <div class="ts"><table><thead><tr>
+          <th onclick="srtKit('articulo')">Código</th>
+          <th onclick="srtKit('descripcion')">Descripción</th>
+          <th onclick="srtKit('categoria')">Categoría</th>
+          <th onclick="srtKit('stock_sap')" style="text-align:right">SAP</th>
+          <th onclick="srtKit('stock_chm')" style="text-align:right">CHM</th>
+          <th>Fuente</th>
+          <th onclick="srtKit('consumo_mensual')" style="text-align:right">Cons./mes</th>
+          <th onclick="srtKit('dias_disponibles')">Cobertura</th>
+          <th onclick="srtKit('estado')">Estado</th>
+        </tr></thead><tbody id="tb-kit"></tbody></table></div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-t">Consumo vs stock <span>— top 10 por consumo</span></div>
-      <div class="chart-legend" id="leg-cons"></div>
-      <div style="position:relative;height:280px"><canvas id="cco" role="img" aria-label="Consumo mensual vs stock"></canvas></div>
-    </div>
-  </div>
 
-  <div class="tw">
-    <div class="th">
-      <span class="tt">Detalle de materiales</span>
-      <div class="e-btns" id="ebtns"></div>
+    <!-- ALERTAS -->
+    <div class="tab-page" id="tab-alertas">
+      <div class="kpi-grid c3" id="kpi-alertas"></div>
+      <div class="sec-title" id="alerta-title"></div>
+      <div id="alertas-list"></div>
     </div>
-    <div class="ts">
-      <table>
-        <thead><tr>
+
+    <!-- STOCK GENERAL -->
+    <div class="tab-page" id="tab-stock">
+      <div id="kpi-stock-cats"></div>
+      <div class="tw" style="margin-top:0">
+        <div class="t-head">
+          <span class="t-title" id="stock-table-title">Todos los materiales</span>
+          <div class="t-controls">
+            <select class="f-sel" id="fc" onchange="applyF()"><option value="">Todas las categorías</option></select>
+            <select class="f-sel" id="fst" onchange="applyF()">
+              <option value="">Todos los estados</option>
+              <option value="CRITICO">Crítico</option>
+              <option value="BAJO">Bajo</option>
+              <option value="NORMAL">Normal</option>
+              <option value="SUFICIENTE">Suficiente</option>
+            </select>
+            <select class="f-sel" id="fsrc" onchange="applyF()">
+              <option value="">SAP + CHM</option>
+              <option value="sap">Solo en SAP</option>
+              <option value="chm">Solo en CHM</option>
+              <option value="both">En ambos</option>
+              <option value="none">Sin stock</option>
+            </select>
+            <select class="f-sel" id="fkit" onchange="applyF()">
+              <option value="">Kit + Otros</option>
+              <option value="kit">Solo Kit</option>
+              <option value="otros">Solo Otros</option>
+            </select>
+            <div class="sw">
+              <span class="si">⌕</span>
+              <input type="text" class="f-srch" id="fsrch" placeholder="Buscar..." oninput="applyF()">
+            </div>
+            <button class="clr-btn" onclick="clrF()">Limpiar</button>
+            <span class="f-cnt" id="fcnt"></span>
+          </div>
+          <div class="e-btns" id="ebtns-stock"></div>
+        </div>
+        <div class="ts"><table><thead><tr>
           <th onclick="srt('articulo')">Código</th>
           <th onclick="srt('descripcion')">Descripción</th>
           <th onclick="srt('categoria')">Categoría</th>
           <th onclick="srt('stock_sap')" style="text-align:right">SAP</th>
           <th onclick="srt('stock_chm')" style="text-align:right">CHM</th>
-          <th onclick="srt('stock_total')" style="text-align:right">Total</th>
+          <th>Fuente</th>
           <th onclick="srt('consumo_mensual')" style="text-align:right">Cons./mes</th>
           <th onclick="srt('dias_disponibles')">Cobertura</th>
           <th onclick="srt('estado')">Estado</th>
-        </tr></thead>
-        <tbody id="tb"></tbody>
-      </table>
+        </tr></thead><tbody id="tb"></tbody></table></div>
+      </div>
     </div>
+
+    <!-- EJECUTIVO -->
+    <div class="tab-page" id="tab-exec">
+      <div class="cat-cards" id="exec-cat-cards"></div>
+      <div class="row2">
+        <div class="card">
+          <div class="card-t">Estado por categoría</div>
+          <div style="position:relative;height:230px"><canvas id="ce-cat"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-t">Cobertura promedio por categoría <span>(meses)</span></div>
+          <div style="position:relative;height:230px"><canvas id="cc-cov"></canvas></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="card">
+          <div class="card-t">Materiales por fuente de stock <span>SAP vs CHM</span></div>
+          <div style="position:relative;height:210px"><canvas id="cc-src"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-t">Distribución general de estados</div>
+          <div class="chart-legend" id="leg-estado"></div>
+          <div style="position:relative;height:170px"><canvas id="ce"></canvas></div>
+        </div>
+      </div>
+    </div>
+
   </div>
-
 </div>
-
-<div class="footer">EDESUR Dominicana, S.A. &mdash; Dirección Comercial &mdash; Gerencia de Servicios Técnicos Centralizados</div>
-
 <script>
-const D = {"generado":"28/04/2026 12:52","kpis":{"total_materiales":194,"criticos":64,"bajos":8,"stock_sap":8511780,"stock_chm":0,"stock_total":8511780,"consumo_mensual_total":2601056},"materiales":[{"articulo":1002837,"descripcion":"CINTA DIELECTRICA SELLADORA 25 MM X 10 M","categoria":"Otros","stock_sap":10400,"stock_chm":0,"stock_total":10400,"consumo_mensual":8957,"dias_disponibles":35,"estado":"BAJO"},{"articulo":1002843,"descripcion":"TORNILLO  DE MAQUINA 1/2' X 3'","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":917,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002844,"descripcion":"TORNILLO  DE MAQUINA 1/2'' X 10''","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":24,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002846,"descripcion":"TORNILLO ESPAC ROSCA CORRIDA 5/8\"X10\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":3,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002867,"descripcion":"GRAPA DERIV 4/0AWG-1000MCM A 6AWG-300MCM","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":1,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002914,"descripcion":"MEDIDOR ELECT 240 V, 3H TIPO SOCKET","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002919,"descripcion":"MEDIDOR IND BOTTOM GPRS CL20 4HILOS","categoria":"Otros","stock_sap":1,"stock_chm":0,"stock_total":1,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002920,"descripcion":"BASE CIRCULAR, ENTRADA DE 1\"","categoria":"Otros","stock_sap":43093,"stock_chm":0,"stock_total":43093,"consumo_mensual":67767,"dias_disponibles":19,"estado":"CRITICO"},{"articulo":1002921,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 8,2 ROSC 1\"","categoria":"Otros","stock_sap":21423,"stock_chm":0,"stock_total":21423,"consumo_mensual":39120,"dias_disponibles":16,"estado":"CRITICO"},{"articulo":1002927,"descripcion":"BASE CL 200 INDUSTRIAL, FORMA 16S","categoria":"Otros","stock_sap":568,"stock_chm":0,"stock_total":568,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002929,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 6,3 ROSC 1\"","categoria":"Otros","stock_sap":23194,"stock_chm":0,"stock_total":23194,"consumo_mensual":37547,"dias_disponibles":19,"estado":"CRITICO"},{"articulo":1002935,"descripcion":"CONECT P/NEUTRO DESN DOBLE INDEPENDIENTE","categoria":"Otros","stock_sap":44939,"stock_chm":0,"stock_total":44939,"consumo_mensual":44292,"dias_disponibles":30,"estado":"CRITICO"},{"articulo":1002939,"descripcion":"SOPORTE DE ANCLAJE PARA POSTE Y CANO","categoria":"Otros","stock_sap":26649,"stock_chm":0,"stock_total":26649,"consumo_mensual":80,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002940,"descripcion":"MOLDURA PLASTICA P/TIERRA 1/2\"X 8'","categoria":"Otros","stock_sap":1223,"stock_chm":0,"stock_total":1223,"consumo_mensual":29,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002941,"descripcion":"TORNILLO TIRAF.RETE. DE 5/16\"POR 3,5\"LO","categoria":"Otros","stock_sap":7028,"stock_chm":0,"stock_total":7028,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002942,"descripcion":"COLLAR AMARRE EN FACHADA","categoria":"Otros","stock_sap":418,"stock_chm":0,"stock_total":418,"consumo_mensual":121399,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002943,"descripcion":"FLEJE DE 10X0,4","categoria":"Otros","stock_sap":33288,"stock_chm":0,"stock_total":33288,"consumo_mensual":624,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002944,"descripcion":"HEBILLAS PARA FLEJE DE 10MM(1/2\")","categoria":"Otros","stock_sap":49434,"stock_chm":0,"stock_total":49434,"consumo_mensual":377,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002945,"descripcion":"HEBILLAS PARA FLEJE DE 20MM(3/4\")","categoria":"Otros","stock_sap":3196,"stock_chm":0,"stock_total":3196,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002946,"descripcion":"TUBERIA FLEXIBLE 1\"","categoria":"Otros","stock_sap":4900,"stock_chm":0,"stock_total":4900,"consumo_mensual":2137,"dias_disponibles":69,"estado":"NORMAL"},{"articulo":1002950,"descripcion":"ADAPTADORES DE PVC 1\" HEMBRA","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002951,"descripcion":"CONECTOR RECTO PARA TUBERIA FLEXIBLE 1\"","categoria":"Otros","stock_sap":171,"stock_chm":0,"stock_total":171,"consumo_mensual":1084,"dias_disponibles":5,"estado":"CRITICO"},{"articulo":1002952,"descripcion":"CONDULET DE 2\"","categoria":"Otros","stock_sap":1325,"stock_chm":0,"stock_total":1325,"consumo_mensual":106,"dias_disponibles":375,"estado":"SUFICIENTE"},{"articulo":1002955,"descripcion":"TAPAS CIEGAS","categoria":"Otros","stock_sap":1085,"stock_chm":0,"stock_total":1085,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002956,"descripcion":"AROS DE SEGURIDAD CON TORNILLO","categoria":"Otros","stock_sap":157792,"stock_chm":0,"stock_total":157792,"consumo_mensual":170067,"dias_disponibles":28,"estado":"CRITICO"},{"articulo":1002957,"descripcion":"TAPE DE VINILO","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":201,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002958,"descripcion":"FUNDAS AISLANTES DE CORTE","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":30,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002965,"descripcion":"CONECTOR DE COBRE ESTAÑADO P/PART.2/0 AW","categoria":"Otros","stock_sap":127,"stock_chm":0,"stock_total":127,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002966,"descripcion":"BAQUELITAS O MORDAZAS CL100.","categoria":"Otros","stock_sap":4384,"stock_chm":0,"stock_total":4384,"consumo_mensual":4288,"dias_disponibles":31,"estado":"BAJO"},{"articulo":1002967,"descripcion":"MOD. INTEG. TRANSF. 3F 12,47kV R15-30/5A","categoria":"Otros","stock_sap":1,"stock_chm":0,"stock_total":1,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002971,"descripcion":"MOD. INTEG. TRANSF.3F 12,47kV R50-100/5A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002981,"descripcion":"ARANDELA PLANA CUADRADA 2'''","categoria":"Otros","stock_sap":52679,"stock_chm":0,"stock_total":52679,"consumo_mensual":106,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003003,"descripcion":"SOPORTE DE ANCLAJE EN FACHADA","categoria":"Otros","stock_sap":74417,"stock_chm":0,"stock_total":74417,"consumo_mensual":15200,"dias_disponibles":147,"estado":"SUFICIENTE"},{"articulo":1003014,"descripcion":"TORNILLO TIRAFONDO DE 1\" X 10\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":5,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003022,"descripcion":"VARILLA PUESTA A TIERRA GALV. 1/2\" X 6\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":1,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003023,"descripcion":"CABLE COBRE AISLAD THHN COLOR VERDE 4mm²","categoria":"Otros","stock_sap":2284,"stock_chm":0,"stock_total":2284,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003026,"descripcion":"TORNILLO CABEZA HEXAGONAL 3/8\"X 2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":2,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003029,"descripcion":"CONECTOR 5/8 P/VARILLA D/TIERRA","categoria":"Otros","stock_sap":23761,"stock_chm":0,"stock_total":23761,"consumo_mensual":52,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003053,"descripcion":"ARANDELA PLANA REDONDA ACERO GALV.1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003068,"descripcion":"ABRAZADERA METALICA TIPO OMEGA DE1/2\"","categoria":"Otros","stock_sap":551068,"stock_chm":0,"stock_total":551068,"consumo_mensual":74,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003085,"descripcion":"TRANSF DE INTENSIDAD 0.6 KV 200.5","categoria":"Otros","stock_sap":1427,"stock_chm":0,"stock_total":1427,"consumo_mensual":67,"dias_disponibles":639,"estado":"SUFICIENTE"},{"articulo":1003104,"descripcion":"TARUGO DE PLASTICO 1/4\" X 1\"","categoria":"Otros","stock_sap":545522,"stock_chm":0,"stock_total":545522,"consumo_mensual":59,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003105,"descripcion":"CABLE DE TIERRA # 6","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":3,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003118,"descripcion":"TERMINAL D/OJO AMARILL P/C.10-12 CERRADO","categoria":"Otros","stock_sap":36384,"stock_chm":0,"stock_total":36384,"consumo_mensual":4432,"dias_disponibles":246,"estado":"SUFICIENTE"},{"articulo":1003142,"descripcion":"CONECTOR CU$A A PRESI\"N AGW 1/0-AGW 1/0","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":31,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003152,"descripcion":"TORNILLO AC.GALVANIZ.C/EXAG.C/T 5/8\"X12\"","categoria":"Otros","stock_sap":291,"stock_chm":0,"stock_total":291,"consumo_mensual":490,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1003161,"descripcion":"ARANDELA PLANA RECTANG. 5/8\"2-1/4\"X2-1/4\"X3/16","categoria":"Otros","stock_sap":27133,"stock_chm":0,"stock_total":27133,"consumo_mensual":295,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003162,"descripcion":"TUERCA DE OJO ACERO GALVANIZADO 5/8\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":197,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003175,"descripcion":"SOPORTE HORQUILLA PARA AISLADOR TIPO CARRETE","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":21,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003176,"descripcion":"CABLE COBRE AISLAD THHN COLOR NEGRO 6mm²","categoria":"Otros","stock_sap":10719,"stock_chm":0,"stock_total":10719,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003177,"descripcion":"CABLE COBRE AISLA THHN COLOR MARRON 6mm²","categoria":"Otros","stock_sap":8880,"stock_chm":0,"stock_total":8880,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003178,"descripcion":"CABLE DE 6MM2 AZUL (#10AWG)","categoria":"Otros","stock_sap":5772,"stock_chm":0,"stock_total":5772,"consumo_mensual":183,"dias_disponibles":946,"estado":"SUFICIENTE"},{"articulo":1003180,"descripcion":"PINZA DE RETENCION DOBLE","categoria":"Otros","stock_sap":186372,"stock_chm":0,"stock_total":186372,"consumo_mensual":95552,"dias_disponibles":59,"estado":"BAJO"},{"articulo":1003181,"descripcion":"VARILLA DE TIERRA DIAM. 5/8'' X 6'","categoria":"Otros","stock_sap":14400,"stock_chm":0,"stock_total":14400,"consumo_mensual":44,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003182,"descripcion":"TUBERIA DE PVC, DIAMETRO 1\" SCHEDULE 40","categoria":"Otros","stock_sap":588,"stock_chm":0,"stock_total":588,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003186,"descripcion":"TERMINAL DE COBRE 16-12","categoria":"Otros","stock_sap":490,"stock_chm":0,"stock_total":490,"consumo_mensual":46,"dias_disponibles":320,"estado":"SUFICIENTE"},{"articulo":1003190,"descripcion":"TERMINAL DE COBRE ESTAÑADO 35 mm²","categoria":"Otros","stock_sap":3721,"stock_chm":0,"stock_total":3721,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003193,"descripcion":"CONECTOR RECTO PARA TUBERIA FLEXIBLE 2\"","categoria":"Otros","stock_sap":2950,"stock_chm":0,"stock_total":2950,"consumo_mensual":130,"dias_disponibles":681,"estado":"SUFICIENTE"},{"articulo":1003194,"descripcion":"CONECTOR CURVO PARA TUBERIA FLEXIBLE 2\"","categoria":"Otros","stock_sap":98,"stock_chm":0,"stock_total":98,"consumo_mensual":144,"dias_disponibles":20,"estado":"CRITICO"},{"articulo":1003195,"descripcion":"TUBERA FLEXIBLE 2\"","categoria":"Otros","stock_sap":2835,"stock_chm":0,"stock_total":2835,"consumo_mensual":436,"dias_disponibles":195,"estado":"SUFICIENTE"},{"articulo":1003196,"descripcion":"CONDULET DE 1\"","categoria":"Otros","stock_sap":3573,"stock_chm":0,"stock_total":3573,"consumo_mensual":13,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003197,"descripcion":"MOD. INTEG. TRANSF. 3F 12,47kV R5-10/5A","categoria":"Otros","stock_sap":6,"stock_chm":0,"stock_total":6,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003198,"descripcion":"MOD. INTEG. TRANSF. 3F 12,47kV R10-20/5A","categoria":"Otros","stock_sap":5,"stock_chm":0,"stock_total":5,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003206,"descripcion":"MOD. INTEGRADO TRANSF. 1F 7,2KV R5-10/5A","categoria":"Otros","stock_sap":4,"stock_chm":0,"stock_total":4,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003209,"descripcion":"TARUGO EXPANSION PLOMO 1/2\" P/TORN 5/16\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":240,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003224,"descripcion":"GRAPA CONEXION DOBLE CABLE TIERRA SIN TO","categoria":"Otros","stock_sap":25942,"stock_chm":0,"stock_total":25942,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003227,"descripcion":"ARANDELA DE PRESION  5/8\"","categoria":"Otros","stock_sap":141589,"stock_chm":0,"stock_total":141589,"consumo_mensual":8,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003242,"descripcion":"TORNILLO TIRAFONDO 1/4\" X 1\"","categoria":"Otros","stock_sap":23777,"stock_chm":0,"stock_total":23777,"consumo_mensual":4509,"dias_disponibles":158,"estado":"SUFICIENTE"},{"articulo":1003243,"descripcion":"TORNILLO TIRAFONDO DE 1/4\" POR 1 1/2\" LONG.","categoria":"Otros","stock_sap":173000,"stock_chm":0,"stock_total":173000,"consumo_mensual":67096,"dias_disponibles":77,"estado":"NORMAL"},{"articulo":1003244,"descripcion":"TORNILLO CABEZA HEX. 5/16\" X 1 1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":2,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003248,"descripcion":"CONECTOR CURVO PARA TUBERIA FLEXIBLE 1\"","categoria":"Otros","stock_sap":628,"stock_chm":0,"stock_total":628,"consumo_mensual":349,"dias_disponibles":54,"estado":"BAJO"},{"articulo":1003250,"descripcion":"ADAPTADORES DE PVC 1\" MACHO","categoria":"Otros","stock_sap":1605,"stock_chm":0,"stock_total":1605,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003306,"descripcion":"CELULA FOTOELECTRICA 240V/1000 WATTS","categoria":"Otros","stock_sap":6,"stock_chm":0,"stock_total":6,"consumo_mensual":39,"dias_disponibles":5,"estado":"CRITICO"},{"articulo":1003383,"descripcion":"CANALETA PLASTICA DE 2.5 MTS X 2\"X 1\"","categoria":"Otros","stock_sap":6814,"stock_chm":0,"stock_total":6814,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003475,"descripcion":"BREAKER DE 40A DOBLE","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":6,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003484,"descripcion":"CABLE DE CONTROL 6 X 12","categoria":"Otros","stock_sap":40,"stock_chm":0,"stock_total":40,"consumo_mensual":8755,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003486,"descripcion":"CABLE DE CONTROL 8 X 14","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":158,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003487,"descripcion":"CABLE DE CONTROL SJTW 12 X 8 HILOS","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003675,"descripcion":"TORNILLO TIRAFONDO 12 1 1/2\"","categoria":"Otros","stock_sap":472,"stock_chm":0,"stock_total":472,"consumo_mensual":2876,"dias_disponibles":5,"estado":"CRITICO"},{"articulo":1003686,"descripcion":"LLAVIN P/ARMARIO TIPO TORPEDO","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":244,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003706,"descripcion":"ARANDELA PLANA REDONDA ACERO INOX.5/8\"","categoria":"Otros","stock_sap":564,"stock_chm":0,"stock_total":564,"consumo_mensual":126,"dias_disponibles":134,"estado":"SUFICIENTE"},{"articulo":1003739,"descripcion":"CAJA 12 ACOM. (12 A 120V Y 6 A 240V)","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":36,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003780,"descripcion":"CABLE DE CONTROL 12 X 12 HILOS","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003791,"descripcion":"TUBERIA FLEXIBLE LIQUID TIGHT DE 3\"","categoria":"Otros","stock_sap":544,"stock_chm":0,"stock_total":544,"consumo_mensual":8,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003797,"descripcion":"TUBO GALV. 2\" X 10'","categoria":"Otros","stock_sap":1802,"stock_chm":0,"stock_total":1802,"consumo_mensual":297,"dias_disponibles":182,"estado":"SUFICIENTE"},{"articulo":1003832,"descripcion":"TARUGO DE PLASTICO 1/4X1.5","categoria":"Otros","stock_sap":76982,"stock_chm":0,"stock_total":76982,"consumo_mensual":14110,"dias_disponibles":164,"estado":"SUFICIENTE"},{"articulo":1003857,"descripcion":"MEDIDOR IND SOCKET PLC CL200 4HILOS","categoria":"Otros","stock_sap":77,"stock_chm":0,"stock_total":77,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003859,"descripcion":"CONTADOR POLIFASICO FORM-9A/10A CL20","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003912,"descripcion":"BASE CL 200 RESID.FORM-2S C/PERNO D/SEGURIDAD","categoria":"Otros","stock_sap":515,"stock_chm":0,"stock_total":515,"consumo_mensual":1186,"dias_disponibles":13,"estado":"CRITICO"},{"articulo":1003913,"descripcion":"CONTADOR REC.240V.CL-200 3H.TWACS","categoria":"Otros","stock_sap":1160,"stock_chm":0,"stock_total":1160,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003957,"descripcion":"MEDIDOR 240 V, TELEM PLC 3H T-SOCKET","categoria":"Otros","stock_sap":36,"stock_chm":0,"stock_total":36,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003958,"descripcion":"MEDIDOR 120 V, TELEM PLC 3H T-SOCKET","categoria":"Otros","stock_sap":237,"stock_chm":0,"stock_total":237,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003986,"descripcion":"PERNO REVPRO ACERO INOXIDABLE","categoria":"Otros","stock_sap":1279,"stock_chm":0,"stock_total":1279,"consumo_mensual":1135,"dias_disponibles":34,"estado":"BAJO"},{"articulo":1004000,"descripcion":"BAQUELITA CL 200 INDUSTRIAL FORM-16S","categoria":"Otros","stock_sap":468,"stock_chm":0,"stock_total":468,"consumo_mensual":13,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004007,"descripcion":"ARMARIO METALICO PARA MEDIDA INDIRECTA","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004008,"descripcion":"ARO REFOZA.CON DISPOSI.P/CANDADO TIPO PERNO","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":1,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004037,"descripcion":"BAQUELITA CL 200 RESIDENCIAL FORMA 2S","categoria":"Otros","stock_sap":10401,"stock_chm":0,"stock_total":10401,"consumo_mensual":171,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004038,"descripcion":"ABRAZADERA 2\" P/SOPORTE T/UNITRON","categoria":"Otros","stock_sap":123658,"stock_chm":0,"stock_total":123658,"consumo_mensual":243,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004044,"descripcion":"TARUGO PLASTICO NARANJA 3/8\" X 1 1/2\"","categoria":"Otros","stock_sap":93128,"stock_chm":0,"stock_total":93128,"consumo_mensual":100062,"dias_disponibles":28,"estado":"CRITICO"},{"articulo":1004050,"descripcion":"RIEL DE BARRA UNITRON 1 3/4\" X 1 3/4\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":149,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004077,"descripcion":"SELLO DOBLE ANCLA COLOR AMARILLO","categoria":"Otros","stock_sap":3000,"stock_chm":0,"stock_total":3000,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004079,"descripcion":"SELLO DOBLE ANCLA COLOR BLANCO","categoria":"Otros","stock_sap":53908,"stock_chm":0,"stock_total":53908,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004081,"descripcion":"SELLO DOBLE ANCLA COLOR MORADO","categoria":"Otros","stock_sap":709551,"stock_chm":0,"stock_total":709551,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004082,"descripcion":"SELLO DOBLE ANCLA COLOR NARANJA","categoria":"Otros","stock_sap":114761,"stock_chm":0,"stock_total":114761,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004109,"descripcion":"TRANSF.DE INTENSIDAD R.200/400.5 600V.60HZ","categoria":"Otros","stock_sap":20548,"stock_chm":0,"stock_total":20548,"consumo_mensual":5364,"dias_disponibles":115,"estado":"SUFICIENTE"},{"articulo":1004132,"descripcion":"CABLE ACERO COBREADO DESNUDO #2 AWG 7 HILOS","categoria":"Otros","stock_sap":56091,"stock_chm":0,"stock_total":56091,"consumo_mensual":6,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004148,"descripcion":"BRIDA DE SUJECIÓN PLASTICA 6\"","categoria":"Otros","stock_sap":974088,"stock_chm":0,"stock_total":974088,"consumo_mensual":292,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004177,"descripcion":"CABLE DE CONTROL SJTW 10 X 4 HILOS","categoria":"Otros","stock_sap":55,"stock_chm":0,"stock_total":55,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004183,"descripcion":"MEDIDOR ELECT 240 V,  3H TIPO BOTTOM","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004184,"descripcion":"MEDIDOR ELECT 120 V,  2H TIPO BOTTOM","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004208,"descripcion":"KIT DE BLINDAJE ELECTRICO ARMORCAST","categoria":"Otros","stock_sap":2457,"stock_chm":0,"stock_total":2457,"consumo_mensual":108,"dias_disponibles":682,"estado":"SUFICIENTE"},{"articulo":1004211,"descripcion":"TARUGO DE PLOMO 5/16`` X 1-1/2``","categoria":"Otros","stock_sap":8011,"stock_chm":0,"stock_total":8011,"consumo_mensual":4199,"dias_disponibles":57,"estado":"BAJO"},{"articulo":1004213,"descripcion":"CABLE DE ACERO COBREADO #6 AWG 3 HILOS","categoria":"Otros","stock_sap":432277,"stock_chm":0,"stock_total":432277,"consumo_mensual":75,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004214,"descripcion":"TARUGO PLASTICO P/TORNILLO 5/16\" X 2\"","categoria":"Otros","stock_sap":1464957,"stock_chm":0,"stock_total":1464957,"consumo_mensual":1251,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004217,"descripcion":"PERNOS SEGURI CABEZA MAGNET TRES ESFERA","categoria":"Otros","stock_sap":49211,"stock_chm":0,"stock_total":49211,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004222,"descripcion":"CAJA P/MEDIDOR POLICARBONATO","categoria":"Otros","stock_sap":1748,"stock_chm":0,"stock_total":1748,"consumo_mensual":51,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004226,"descripcion":"CONDUCTOR CONCENTRICO 2XN§10 COBRE","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004228,"descripcion":"MAIN BREAKER 3 POLOS 300 AMPERES","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":5,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004234,"descripcion":"GRAPA AMARRE ALUMINIO PARA COND. AWG 1/0(RAVEN","categoria":"Otros","stock_sap":3381,"stock_chm":0,"stock_total":3381,"consumo_mensual":4,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004236,"descripcion":"GRAPA AMARRE ALUMINIO COND. MCM 477 (HAWK)","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":7,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004266,"descripcion":"TORNILLO MAQUINA AC.GALV.C.HEXAG. 5-8X3","categoria":"Otros","stock_sap":5116,"stock_chm":0,"stock_total":5116,"consumo_mensual":20,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004284,"descripcion":"TERMINAL D/COMP. BIMT PLETINA. 4/0AWG,2A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004287,"descripcion":"TORNILLO AC.INOXIDABLE/EXAG.C.T.1/2\"X2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":29,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004289,"descripcion":"ARANDELA PLANA REDONDA AC.INOX. 1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":2,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004313,"descripcion":"BRIDA DE SUJECION PLASTICA 9 mm X 175 mm","categoria":"Otros","stock_sap":47624,"stock_chm":0,"stock_total":47624,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004314,"descripcion":"BRIDA DE SUJECION PLASTICA 9 MM X 360 MM","categoria":"Otros","stock_sap":5563,"stock_chm":0,"stock_total":5563,"consumo_mensual":122596,"dias_disponibles":1,"estado":"CRITICO"},{"articulo":1004320,"descripcion":"CONECTOR CUÑA  PRESIÓN 4-0 AWG - 1-0 AWG","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004321,"descripcion":"CONECTOR CU$A A PRESI\"N AGW4/0 - N'2 CU","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":20,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004334,"descripcion":"CONDUCTOR CONCENTRICO 3XN'4 COBRE","categoria":"Otros","stock_sap":26,"stock_chm":0,"stock_total":26,"consumo_mensual":475,"dias_disponibles":2,"estado":"CRITICO"},{"articulo":1004373,"descripcion":"TORNILLO DE ESPACIAMIENTO AC.GALV.5-8x12","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":6,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004376,"descripcion":"PINZA DE ANCLAJE #2-1000","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":5,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004378,"descripcion":"FLEJE DE SUJECCION 20X0,7 MM","categoria":"Otros","stock_sap":912,"stock_chm":0,"stock_total":912,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004379,"descripcion":"CAJA DERIVACION MONOFASICA 9 SALIDAS 1000V","categoria":"Otros","stock_sap":3542,"stock_chm":0,"stock_total":3542,"consumo_mensual":407,"dias_disponibles":261,"estado":"SUFICIENTE"},{"articulo":1004381,"descripcion":"TERMINAL D/COMP. BIMT PLETINA. 4/0 AWG,1","categoria":"Otros","stock_sap":3,"stock_chm":0,"stock_total":3,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004503,"descripcion":"CONECTOR DE PERFORACION DOBLE INDEPENDIENTE","categoria":"Otros","stock_sap":128782,"stock_chm":0,"stock_total":128782,"consumo_mensual":91591,"dias_disponibles":42,"estado":"BAJO"},{"articulo":1004507,"descripcion":"TERMINAL DE COBRE 75-12","categoria":"Otros","stock_sap":406,"stock_chm":0,"stock_total":406,"consumo_mensual":1172,"dias_disponibles":10,"estado":"CRITICO"},{"articulo":1004546,"descripcion":"BREAKER 2 POLO 50A","categoria":"Otros","stock_sap":44854,"stock_chm":0,"stock_total":44854,"consumo_mensual":238,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004549,"descripcion":"CONTADOR CL 20 4 HILOS REPARADO","categoria":"Otros","stock_sap":40,"stock_chm":0,"stock_total":40,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004550,"descripcion":"CONTADOR CL 200 3 HILOS REPARADO","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004551,"descripcion":"CONTADOR CL 200 4 HILOS REPARADO","categoria":"Otros","stock_sap":2,"stock_chm":0,"stock_total":2,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004570,"descripcion":"CONTADOR NETWORK TWACS REPARADO","categoria":"Otros","stock_sap":438,"stock_chm":0,"stock_total":438,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004573,"descripcion":"CONTADOR 120V.ELECTRONICO REPARADO","categoria":"Otros","stock_sap":100,"stock_chm":0,"stock_total":100,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004574,"descripcion":"CONTADOR 240V.ELECTROMECANICO","categoria":"Otros","stock_sap":196,"stock_chm":0,"stock_total":196,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004588,"descripcion":"SOPORTE P/CAJA DERIV. 9\"X19\"X1-3/4\"X5/16","categoria":"Otros","stock_sap":434,"stock_chm":0,"stock_total":434,"consumo_mensual":129,"dias_disponibles":101,"estado":"SUFICIENTE"},{"articulo":1004604,"descripcion":"CONDUCTOR MULTIFIBRA 35 MM²","categoria":"Otros","stock_sap":921,"stock_chm":0,"stock_total":921,"consumo_mensual":1528,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1004606,"descripcion":"CONDUCTOR MULTIFIBRA 25 MM²","categoria":"Otros","stock_sap":20431,"stock_chm":0,"stock_total":20431,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004627,"descripcion":"CONDUCT.CONCENTRICOS 3XN6 AWG ALUM.","categoria":"Otros","stock_sap":367569,"stock_chm":0,"stock_total":367569,"consumo_mensual":1277954,"dias_disponibles":9,"estado":"CRITICO"},{"articulo":1004628,"descripcion":"CONDUCT.CONCENTRICOS 3XN2 AWG ALUM.","categoria":"Otros","stock_sap":740,"stock_chm":0,"stock_total":740,"consumo_mensual":504,"dias_disponibles":44,"estado":"BAJO"},{"articulo":1004629,"descripcion":"CONDUCT.CONCENTRICOS 2XN8 AWG ALUM.","categoria":"Otros","stock_sap":23169,"stock_chm":0,"stock_total":23169,"consumo_mensual":194221,"dias_disponibles":4,"estado":"CRITICO"},{"articulo":1004644,"descripcion":"CONDUCTOR MULTIFIBRAS 95 MM² 600V","categoria":"Otros","stock_sap":9084,"stock_chm":0,"stock_total":9084,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004825,"descripcion":"BREAKERS 2X63 AMP.","categoria":"Otros","stock_sap":2955,"stock_chm":0,"stock_total":2955,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004949,"descripcion":"BRIDA DE SUJECCION PLAST.DE 4 PULG.","categoria":"Otros","stock_sap":74948,"stock_chm":0,"stock_total":74948,"consumo_mensual":100,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1005047,"descripcion":"CONDUCT.CONCENTRICOS 3XN4 AWG ALUM","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":149,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1005103,"descripcion":"FUSIBLE MTU TWACS 200A","categoria":"Otros","stock_sap":23,"stock_chm":0,"stock_total":23,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008462,"descripcion":"DISPLAY PARA MEDIDOR PREPAGO","categoria":"Otros","stock_sap":39714,"stock_chm":0,"stock_total":39714,"consumo_mensual":3651,"dias_disponibles":326,"estado":"SUFICIENTE"},{"articulo":1008463,"descripcion":"MEDIDOR MODULAR PREPAGO 120VAC","categoria":"Otros","stock_sap":129,"stock_chm":0,"stock_total":129,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008464,"descripcion":"COLECTOR  PARA MUDULO DE MEDICION CONCEN","categoria":"Otros","stock_sap":218,"stock_chm":0,"stock_total":218,"consumo_mensual":581,"dias_disponibles":11,"estado":"CRITICO"},{"articulo":1008465,"descripcion":"MEDIDOR MODULAR PREPAGO 240VAC","categoria":"Otros","stock_sap":338,"stock_chm":0,"stock_total":338,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008466,"descripcion":"MODULO CONCENTRADOR PARA MEDICION PREPAG","categoria":"Otros","stock_sap":2071,"stock_chm":0,"stock_total":2071,"consumo_mensual":447,"dias_disponibles":139,"estado":"SUFICIENTE"},{"articulo":1008537,"descripcion":"TRANSF CORRIENTE BT 400-5A 600V CABLIADO","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008538,"descripcion":"TRANSF CORRIENTE BT 600-5A 600V CABLEADO","categoria":"Otros","stock_sap":10,"stock_chm":0,"stock_total":10,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008714,"descripcion":"MED 1¿ INDIRECTO, 3 H, SOCKET O BOTTOM","categoria":"Otros","stock_sap":7964,"stock_chm":0,"stock_total":7964,"consumo_mensual":2781,"dias_disponibles":86,"estado":"NORMAL"},{"articulo":1008836,"descripcion":"CONDUCTOR DUPLO # 14 AWG","categoria":"Otros","stock_sap":50818,"stock_chm":0,"stock_total":50818,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008984,"descripcion":"MED RES1F 3 H,SOCKET(FM 2S)TWACS 240VDES","categoria":"Otros","stock_sap":1,"stock_chm":0,"stock_total":1,"consumo_mensual":45203,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008985,"descripcion":"MED RES1F 3H,SOCKET(FM2S)TWACS 208VDES","categoria":"Otros","stock_sap":4452,"stock_chm":0,"stock_total":4452,"consumo_mensual":5549,"dias_disponibles":24,"estado":"CRITICO"},{"articulo":1009050,"descripcion":"CABLE COBRE AISLAD THHN COLOR NEGRO 4mm²","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1009636,"descripcion":"MEDIDOR 120 V, TELEM PLC 2H T-SOCKET","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1010623,"descripcion":"CABLE AISLADO 600V 12 X 3 HILOS","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":3,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1010706,"descripcion":"UNION DE EMP BIOMETALICO T/MANGUITO AWG 6","categoria":"Otros","stock_sap":499693,"stock_chm":0,"stock_total":499693,"consumo_mensual":20,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1011423,"descripcion":"BASE PORTA MEDIDOR SOCKET INDIRECT FM 4S","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":289,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1011875,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012026,"descripcion":"TUERCA HEX.ACERO GALV. 12MM","categoria":"Otros","stock_sap":41781,"stock_chm":0,"stock_total":41781,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012155,"descripcion":"TORNILLO TIRAFONDO 5/16' X 2 '","categoria":"Otros","stock_sap":28178,"stock_chm":0,"stock_total":28178,"consumo_mensual":123,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012156,"descripcion":"TORNILLO TIRAFONDO 1/4'' X 2''","categoria":"Otros","stock_sap":123681,"stock_chm":0,"stock_total":123681,"consumo_mensual":485,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012446,"descripcion":"TORNILLO TIRAFONDO 1- 4' X 1' V'","categoria":"Otros","stock_sap":98386,"stock_chm":0,"stock_total":98386,"consumo_mensual":21,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012959,"descripcion":"TORNILLO AUTO PERFORANTE 1-4 X 1 1/2'","categoria":"Otros","stock_sap":31774,"stock_chm":0,"stock_total":31774,"consumo_mensual":448,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012965,"descripcion":"SELLOS DE ALTA SEGURIDAD TIPO PIN MORRÓN","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013174,"descripcion":"TUBO ESPECIAL GALVANIZADO 4¿¿ X 15¿","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":201,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1013434,"descripcion":"Medidor 120V, Telem. PLC 2H T-SOCKER RC","categoria":"Otros","stock_sap":2117,"stock_chm":0,"stock_total":2117,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013465,"descripcion":"MODULO DE MEDICION CONCENTRADA 8","categoria":"Otros","stock_sap":620,"stock_chm":0,"stock_total":620,"consumo_mensual":34,"dias_disponibles":547,"estado":"SUFICIENTE"},{"articulo":1013466,"descripcion":"MODULO DE MEDICION CONCENTRADA 12","categoria":"Otros","stock_sap":386,"stock_chm":0,"stock_total":386,"consumo_mensual":61,"dias_disponibles":190,"estado":"SUFICIENTE"},{"articulo":1013506,"descripcion":"TUBO DE ACERO GALVANIZADO DE 2\" X 15'","categoria":"Otros","stock_sap":4844,"stock_chm":0,"stock_total":4844,"consumo_mensual":308,"dias_disponibles":472,"estado":"SUFICIENTE"},{"articulo":1013509,"descripcion":"TORNILLO TIRAFONDO 1/4\" X 1\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":16545,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1013551,"descripcion":"COLECTOR  PARA MUDULO DE MEDI CONCEN RC","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":111,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1013612,"descripcion":"MED. TELEM PLC C-TEL 240V, 3H T-SOCK RC'","categoria":"Otros","stock_sap":1069,"stock_chm":0,"stock_total":1069,"consumo_mensual":2184,"dias_disponibles":15,"estado":"CRITICO"},{"articulo":1013826,"descripcion":"CONDUCTOR CONCENTRICO AL- CU 2X8","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":12,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1013827,"descripcion":"CONDUCTOR CONCENTRICO  AL-CU 3X6","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1014569,"descripcion":"BASE CIRCULAR POLICARBONATO- ENTRADA 1","categoria":"Otros","stock_sap":662,"stock_chm":0,"stock_total":662,"consumo_mensual":946,"dias_disponibles":21,"estado":"CRITICO"},{"articulo":1014804,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN MARRON","categoria":"Otros","stock_sap":266019,"stock_chm":0,"stock_total":266019,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1014856,"descripcion":"MED. TELEM PLC C-TEL 120-208V, 3H T-SOCK","categoria":"Otros","stock_sap":191,"stock_chm":0,"stock_total":191,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1016271,"descripcion":"LIMIT SWITCH PARA MODULO CONCENTRACION","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":34,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2000368,"descripcion":"TOMA CORRIENTE DOBLE 15A./110V.","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":21,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2010886,"descripcion":"CAJA RECTANGULAR 2X4 TOMACORRIENTE","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":16,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2010888,"descripcion":"TAPA PARA TOMACORRIENTE","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":21,"dias_disponibles":0,"estado":"CRITICO"}],"por_zona":{},"por_sector":{},"por_ct":{},"por_categoria":{"Otros":8511780},"por_estado":{"SUFICIENTE":119,"CRITICO":64,"BAJO":8,"NORMAL":3},"zonas":[],"sectores":[],"categorias":["Otros"],"kit":{"articulos":[1002920,1002921,1002929,1002942,1002956,1003003,1003180,1003243,1003913,1003957,1003958,1004044,1004080,1004081,1004082,1004314,1004503,1004570,1004574,1004627,1004629,1008463,1008465,1008714,1008984,1008985,1009636,1011423,1011875,1012965,1013434,1013612,1014804],"total":33,"encontrados":32,"criticos":13,"bajos":2,"normales":2,"suficientes":15,"pct_ok":52,"materiales":[{"articulo":1002920,"consumo_mensual":67767,"descripcion":"BASE CIRCULAR, ENTRADA DE 1\"","stock_sap":43093,"stock_chm":0,"categoria":"Otros","stock_total":43093,"dias_disponibles":19,"estado":"CRITICO"},{"articulo":1002921,"consumo_mensual":39120,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 8,2 ROSC 1\"","stock_sap":21423,"stock_chm":0,"categoria":"Otros","stock_total":21423,"dias_disponibles":16,"estado":"CRITICO"},{"articulo":1002929,"consumo_mensual":37547,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 6,3 ROSC 1\"","stock_sap":23194,"stock_chm":0,"categoria":"Otros","stock_total":23194,"dias_disponibles":19,"estado":"CRITICO"},{"articulo":1002942,"consumo_mensual":121399,"descripcion":"COLLAR AMARRE EN FACHADA","stock_sap":418,"stock_chm":0,"categoria":"Otros","stock_total":418,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002956,"consumo_mensual":170067,"descripcion":"AROS DE SEGURIDAD CON TORNILLO","stock_sap":157792,"stock_chm":0,"categoria":"Otros","stock_total":157792,"dias_disponibles":28,"estado":"CRITICO"},{"articulo":1003003,"consumo_mensual":15200,"descripcion":"SOPORTE DE ANCLAJE EN FACHADA","stock_sap":74417,"stock_chm":0,"categoria":"Otros","stock_total":74417,"dias_disponibles":147,"estado":"SUFICIENTE"},{"articulo":1003180,"consumo_mensual":95552,"descripcion":"PINZA DE RETENCION DOBLE","stock_sap":186372,"stock_chm":0,"categoria":"Otros","stock_total":186372,"dias_disponibles":59,"estado":"BAJO"},{"articulo":1003243,"consumo_mensual":67096,"descripcion":"TORNILLO TIRAFONDO DE 1/4\" POR 1 1/2\" LONG.","stock_sap":173000,"stock_chm":0,"categoria":"Otros","stock_total":173000,"dias_disponibles":77,"estado":"NORMAL"},{"articulo":1003913,"consumo_mensual":0,"descripcion":"CONTADOR REC.240V.CL-200 3H.TWACS","stock_sap":1160,"stock_chm":0,"categoria":"Otros","stock_total":1160,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003957,"consumo_mensual":0,"descripcion":"MEDIDOR 240 V, TELEM PLC 3H T-SOCKET","stock_sap":36,"stock_chm":0,"categoria":"Otros","stock_total":36,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003958,"consumo_mensual":0,"descripcion":"MEDIDOR 120 V, TELEM PLC 3H T-SOCKET","stock_sap":237,"stock_chm":0,"categoria":"Otros","stock_total":237,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004044,"consumo_mensual":100062,"descripcion":"TARUGO PLASTICO NARANJA 3/8\" X 1 1/2\"","stock_sap":93128,"stock_chm":0,"categoria":"Otros","stock_total":93128,"dias_disponibles":28,"estado":"CRITICO"},{"articulo":1004081,"consumo_mensual":0,"descripcion":"SELLO DOBLE ANCLA COLOR MORADO","stock_sap":709551,"stock_chm":0,"categoria":"Otros","stock_total":709551,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004082,"consumo_mensual":0,"descripcion":"SELLO DOBLE ANCLA COLOR NARANJA","stock_sap":114761,"stock_chm":0,"categoria":"Otros","stock_total":114761,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004314,"consumo_mensual":122596,"descripcion":"BRIDA DE SUJECION PLASTICA 9 MM X 360 MM","stock_sap":5563,"stock_chm":0,"categoria":"Otros","stock_total":5563,"dias_disponibles":1,"estado":"CRITICO"},{"articulo":1004503,"consumo_mensual":91591,"descripcion":"CONECTOR DE PERFORACION DOBLE INDEPENDIENTE","stock_sap":128782,"stock_chm":0,"categoria":"Otros","stock_total":128782,"dias_disponibles":42,"estado":"BAJO"},{"articulo":1004570,"consumo_mensual":0,"descripcion":"CONTADOR NETWORK TWACS REPARADO","stock_sap":438,"stock_chm":0,"categoria":"Otros","stock_total":438,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004574,"consumo_mensual":0,"descripcion":"CONTADOR 240V.ELECTROMECANICO","stock_sap":196,"stock_chm":0,"categoria":"Otros","stock_total":196,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004627,"consumo_mensual":1277954,"descripcion":"CONDUCT.CONCENTRICOS 3XN6 AWG ALUM.","stock_sap":367569,"stock_chm":0,"categoria":"Otros","stock_total":367569,"dias_disponibles":9,"estado":"CRITICO"},{"articulo":1004629,"consumo_mensual":194221,"descripcion":"CONDUCT.CONCENTRICOS 2XN8 AWG ALUM.","stock_sap":23169,"stock_chm":0,"categoria":"Otros","stock_total":23169,"dias_disponibles":4,"estado":"CRITICO"},{"articulo":1008463,"consumo_mensual":0,"descripcion":"MEDIDOR MODULAR PREPAGO 120VAC","stock_sap":129,"stock_chm":0,"categoria":"Otros","stock_total":129,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008465,"consumo_mensual":0,"descripcion":"MEDIDOR MODULAR PREPAGO 240VAC","stock_sap":338,"stock_chm":0,"categoria":"Otros","stock_total":338,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008714,"consumo_mensual":2781,"descripcion":"MED 1¿ INDIRECTO, 3 H, SOCKET O BOTTOM","stock_sap":7964,"stock_chm":0,"categoria":"Otros","stock_total":7964,"dias_disponibles":86,"estado":"NORMAL"},{"articulo":1008984,"consumo_mensual":45203,"descripcion":"MED RES1F 3 H,SOCKET(FM 2S)TWACS 240VDES","stock_sap":1,"stock_chm":0,"categoria":"Otros","stock_total":1,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008985,"consumo_mensual":5549,"descripcion":"MED RES1F 3H,SOCKET(FM2S)TWACS 208VDES","stock_sap":4452,"stock_chm":0,"categoria":"Otros","stock_total":4452,"dias_disponibles":24,"estado":"CRITICO"},{"articulo":1009636,"consumo_mensual":0,"descripcion":"MEDIDOR 120 V, TELEM PLC 2H T-SOCKET","stock_sap":0,"stock_chm":0,"categoria":"Otros","stock_total":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1011423,"consumo_mensual":289,"descripcion":"BASE PORTA MEDIDOR SOCKET INDIRECT FM 4S","stock_sap":0,"stock_chm":0,"categoria":"Otros","stock_total":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1011875,"consumo_mensual":0,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN","stock_sap":0,"stock_chm":0,"categoria":"Otros","stock_total":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012965,"consumo_mensual":0,"descripcion":"SELLOS DE ALTA SEGURIDAD TIPO PIN MORRÓN","stock_sap":0,"stock_chm":0,"categoria":"Otros","stock_total":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013434,"consumo_mensual":0,"descripcion":"Medidor 120V, Telem. PLC 2H T-SOCKER RC","stock_sap":2117,"stock_chm":0,"categoria":"Otros","stock_total":2117,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013612,"consumo_mensual":2184,"descripcion":"MED. TELEM PLC C-TEL 240V, 3H T-SOCK RC'","stock_sap":1069,"stock_chm":0,"categoria":"Otros","stock_total":1069,"dias_disponibles":15,"estado":"CRITICO"},{"articulo":1014804,"consumo_mensual":0,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN MARRON","stock_sap":266019,"stock_chm":0,"categoria":"Otros","stock_total":266019,"dias_disponibles":999,"estado":"SUFICIENTE"}]},"kit_kpis":{"total":33,"critico":13,"bajo":2,"normal":2,"suficiente":15,"pct_cobertura":52}};
+const D = {"generado":"29/04/2026","kpis":{"total_materiales":279,"criticos":158,"bajos":6,"stock_sap":10180578,"stock_chm":318611},"materiales":[{"articulo":1002914,"descripcion":"MEDIDOR ELECT 240 V, 3H TIPO SOCKET","categoria":"Medidores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002971,"descripcion":"MOD. INTEG. TRANSF.3F 12,47kV R50-100/5A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003780,"descripcion":"CABLE DE CONTROL 12 X 12 HILOS","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004080,"descripcion":"SELLO DOBLE ANCLA COLOR MARRÓN","categoria":"Sellos","stock_sap":0,"stock_chm":30,"stock_total":30,"consumo_mensual":7284,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004083,"descripcion":"SELLO DOBLE ANCLA COLOR ROJO","categoria":"Sellos","stock_sap":0,"stock_chm":30,"stock_total":30,"consumo_mensual":231,"dias_disponibles":4,"estado":"CRITICO"},{"articulo":1004284,"descripcion":"TERMINAL D/COMP. BIMT PLETINA. 4/0AWG,2A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004550,"descripcion":"CONTADOR CL 200 3 HILOS REPARADO","categoria":"Medidores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008537,"descripcion":"TRANSF CORRIENTE BT 400-5A 600V CABLIADO","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008984,"descripcion":"MEDIDOR TELEM PLC C-TEL 240V, 3H T-SOCK","categoria":"Medidores","stock_sap":1,"stock_chm":14,"stock_total":15,"consumo_mensual":13082,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1009050,"descripcion":"CABLE COBRE AISLAD THHN COLOR NEGRO 4mm²","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1011423,"descripcion":"BASE PORTA MEDIDOR SOCKET INDIRECT FM 4S","categoria":"Medidores","stock_sap":0,"stock_chm":10,"stock_total":10,"consumo_mensual":24,"dias_disponibles":12,"estado":"CRITICO"},{"articulo":1011875,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN","categoria":"Sellos","stock_sap":0,"stock_chm":128,"stock_total":128,"consumo_mensual":7714,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1012965,"descripcion":"SELLOS DE ALTA SEGURIDAD TIPO PIN MORRÓN","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":263,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1013827,"descripcion":"CONDUCTOR CONCENTRICO  AL-CU 3X6","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002919,"descripcion":"MEDIDOR IND BOTTOM GPRS CL20 4HILOS","categoria":"Medidores","stock_sap":1,"stock_chm":0,"stock_total":1,"consumo_mensual":50,"dias_disponibles":1,"estado":"CRITICO"},{"articulo":1012964,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN MORADO","categoria":"Sellos","stock_sap":0,"stock_chm":82,"stock_total":82,"consumo_mensual":314,"dias_disponibles":8,"estado":"CRITICO"},{"articulo":1003484,"descripcion":"CABLE DE CONTROL 6 X 12","categoria":"Conductores","stock_sap":40,"stock_chm":61,"stock_total":101,"consumo_mensual":730,"dias_disponibles":4,"estado":"CRITICO"},{"articulo":1003859,"descripcion":"CONTADOR POLIFASICO FORM-9A/10A CL20","categoria":"Medidores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":11,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004184,"descripcion":"MEDIDOR ELECT 120 V,  2H TIPO BOTTOM","categoria":"Medidores","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":9,"dias_disponibles":3,"estado":"CRITICO"},{"articulo":1004183,"descripcion":"MEDIDOR ELECT 240 V,  3H TIPO BOTTOM","categoria":"Medidores","stock_sap":0,"stock_chm":2,"stock_total":2,"consumo_mensual":12,"dias_disponibles":5,"estado":"CRITICO"},{"articulo":1013551,"descripcion":"COLECTOR  PARA MUDULO DE MEDI CONCEN RC","categoria":"Otros","stock_sap":0,"stock_chm":3,"stock_total":3,"consumo_mensual":9,"dias_disponibles":10,"estado":"CRITICO"},{"articulo":1004551,"descripcion":"CONTADOR CL 200 4 HILOS REPARADO","categoria":"Medidores","stock_sap":2,"stock_chm":0,"stock_total":2,"consumo_mensual":8,"dias_disponibles":7,"estado":"CRITICO"},{"articulo":1013612,"descripcion":"MED. TELEM PLC C-TEL 240V, 3H T-SOCK RC","categoria":"Medidores","stock_sap":32,"stock_chm":166,"stock_total":198,"consumo_mensual":517,"dias_disponibles":11,"estado":"CRITICO"},{"articulo":1002942,"descripcion":"COLLAR AMARRE EN FACHADA","categoria":"Accesorios","stock_sap":418,"stock_chm":5653,"stock_total":6071,"consumo_mensual":10117,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1009636,"descripcion":"MEDIDOR 120 V, TELEM PLC 2H T-SOCKET","categoria":"Medidores","stock_sap":0,"stock_chm":5,"stock_total":5,"consumo_mensual":101,"dias_disponibles":1,"estado":"CRITICO"},{"articulo":1013509,"descripcion":"TORNILLO TIRAFONDO 1/4\" X 1\"","categoria":"Accesorios","stock_sap":0,"stock_chm":1199,"stock_total":1199,"consumo_mensual":1379,"dias_disponibles":26,"estado":"CRITICO"},{"articulo":1008465,"descripcion":"MEDIDOR MODULAR PREPAGO 240VAC","categoria":"Medidores","stock_sap":273,"stock_chm":322,"stock_total":595,"consumo_mensual":1201,"dias_disponibles":15,"estado":"CRITICO"},{"articulo":1003857,"descripcion":"MEDIDOR IND SOCKET PLC CL200 4HILOS","categoria":"Medidores","stock_sap":77,"stock_chm":0,"stock_total":77,"consumo_mensual":128,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1004573,"descripcion":"CONTADOR 120V.ELECTRONICO REPARADO","categoria":"Medidores","stock_sap":200,"stock_chm":94,"stock_total":294,"consumo_mensual":310,"dias_disponibles":28,"estado":"CRITICO"},{"articulo":1008463,"descripcion":"MEDIDOR MODULAR PREPAGO 120VAC","categoria":"Medidores","stock_sap":129,"stock_chm":61,"stock_total":190,"consumo_mensual":318,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1003957,"descripcion":"MEDIDOR 240 V, TELEM PLC 3H T-SOCKET","categoria":"Medidores","stock_sap":44,"stock_chm":0,"stock_total":44,"consumo_mensual":83,"dias_disponibles":16,"estado":"CRITICO"},{"articulo":1002915,"descripcion":"CONTADOR NETWORK","categoria":"Medidores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002957,"descripcion":"TAPE DE VINILO","categoria":"Otros","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":17,"dias_disponibles":2,"estado":"CRITICO"},{"articulo":1002967,"descripcion":"MOD. INTEG. TRANSF. 3F 12,47kV R15-30/5A","categoria":"Otros","stock_sap":1,"stock_chm":0,"stock_total":1,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002969,"descripcion":"MOD.TRANSF.TRIF.12,5 KV. R.25-50/5","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002970,"descripcion":"MOD.TRANSF.TRIF.12,5 KV. R.40-80/5","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003071,"descripcion":"CONJUNTO DE TERRAJA 3/8\" A 2\"","categoria":"Otros","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003217,"descripcion":"MOD.TRANSF TRIF.12.5 KVR. 300/600-5 A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003218,"descripcion":"MOD.TRANSF TRIF.12.5 KVR. 150/300-5 A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003528,"descripcion":"VARA TELESCOPICA 40'","categoria":"Otros","stock_sap":0,"stock_chm":3,"stock_total":3,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004197,"descripcion":"MAIN BREAKER 2 POLOS 200 AMPERES","categoria":"Otros","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004609,"descripcion":"ARMARIO PARA TRAFOS DE INTENSIDAD","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004610,"descripcion":"TRANSF.DE INTENSIDAD 0.6KV, 400/5","categoria":"Otros","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1009720,"descripcion":"LLAVE PARA PERNO DE SEGURIDAD MAESTRA'","categoria":"Otros","stock_sap":0,"stock_chm":4,"stock_total":4,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2000696,"descripcion":"INTERRUPTOR TERMOMAG. 250A 3F","categoria":"Otros","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2002975,"descripcion":"OMU, NORMAL TEMP, 277/480V'","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004549,"descripcion":"CONTADOR CL 20 4 HILOS REPARADO","categoria":"Medidores","stock_sap":26,"stock_chm":0,"stock_total":26,"consumo_mensual":25,"dias_disponibles":31,"estado":"BAJO"},{"articulo":1004334,"descripcion":"CONDUCTOR CONCENTRICO 3XN§4 COBRE","categoria":"Conductores","stock_sap":26,"stock_chm":20,"stock_total":46,"consumo_mensual":40,"dias_disponibles":35,"estado":"BAJO"},{"articulo":1004574,"descripcion":"CONTADOR 240V.ELECTROMECANICO","categoria":"Medidores","stock_sap":232,"stock_chm":176,"stock_total":408,"consumo_mensual":325,"dias_disponibles":38,"estado":"BAJO"},{"articulo":1003686,"descripcion":"LLAVIN D/SEGURIDAD PORTA PERNO P/PANELES","categoria":"Otros","stock_sap":0,"stock_chm":80,"stock_total":80,"consumo_mensual":20,"dias_disponibles":118,"estado":"SUFICIENTE"},{"articulo":1004629,"descripcion":"CONDUCT.CONCENTRICOS 2XN8 AWG ALUM.","categoria":"Conductores","stock_sap":15969,"stock_chm":15941,"stock_total":31910,"consumo_mensual":16185,"dias_disponibles":59,"estado":"BAJO"},{"articulo":1003306,"descripcion":"CELULA FOTOELECTRICA 240V/1000 WATTS","categoria":"Otros","stock_sap":6,"stock_chm":0,"stock_total":6,"consumo_mensual":3,"dias_disponibles":56,"estado":"BAJO"},{"articulo":1003675,"descripcion":"TORNILLO TIRAFONDO 12 1 1/2\"","categoria":"Accesorios","stock_sap":472,"stock_chm":0,"stock_total":472,"consumo_mensual":240,"dias_disponibles":59,"estado":"BAJO"},{"articulo":1002973,"descripcion":"MOD.TRANSF TRIF.12,5 KV. R.100-200/5","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003037,"descripcion":"TUBO GALVANIZADO DE 3\" X 10'","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1012364,"descripcion":"SELLO DOBLE ANCLA SMCA COLOR AZÚL","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003486,"descripcion":"CABLE DE CONTROL 8 X 14","categoria":"Conductores","stock_sap":0,"stock_chm":257,"stock_total":257,"consumo_mensual":13,"dias_disponibles":584,"estado":"SUFICIENTE"},{"articulo":1003913,"descripcion":"CONTADOR REC.240V.CL-200 3H.TWACS","categoria":"Medidores","stock_sap":752,"stock_chm":852,"stock_total":1604,"consumo_mensual":501,"dias_disponibles":96,"estado":"SUFICIENTE"},{"articulo":1013434,"descripcion":"Medidor 120V, Telem. PLC 2H T-SOCKER RC","categoria":"Medidores","stock_sap":2469,"stock_chm":921,"stock_total":3390,"consumo_mensual":1155,"dias_disponibles":88,"estado":"NORMAL"},{"articulo":1002840,"descripcion":"CRUCETA DE ACERO GALV 8-0\" 3\"X3\"X1/4\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002960,"descripcion":"HERRAMIENTA ZUNCHADORA PARA FLEJE","categoria":"Otros","stock_sap":0,"stock_chm":3,"stock_total":3,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003233,"descripcion":"AISLADOR COMP. T/ SUSP. 13,2KV.70KN","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004320,"descripcion":"CONECTOR CUÑA  PRESIÓN 4-0 AWG - 1-0 AWG","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":3,"stock_total":3,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004371,"descripcion":"CRUCETA ANGULAR METALICA 1830 MM","categoria":"Otros","stock_sap":0,"stock_chm":3,"stock_total":3,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2003436,"descripcion":"TARJETA SCPA-G2","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008985,"descripcion":"MEDIDOR TELEM PLC C-TEL 120V, 3H T-SOCK","categoria":"Medidores","stock_sap":4452,"stock_chm":42,"stock_total":4494,"consumo_mensual":1438,"dias_disponibles":94,"estado":"SUFICIENTE"},{"articulo":1004627,"descripcion":"CONDUCT.CONCENTRICOS 3XN6 AWG ALUM.","categoria":"Conductores","stock_sap":324669,"stock_chm":22643,"stock_total":347312,"consumo_mensual":106496,"dias_disponibles":98,"estado":"SUFICIENTE"},{"articulo":1002951,"descripcion":"CONECTOR RECTO P/TUBERÍA FLEXIBLE 1\" LIQ","categoria":"Conectores/Bases","stock_sap":171,"stock_chm":403,"stock_total":574,"consumo_mensual":90,"dias_disponibles":191,"estado":"SUFICIENTE"},{"articulo":1002839,"descripcion":"CRUCETA DE ACERO GALV 6-0\" 3\"X3\"X1/4\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002844,"descripcion":"TORNILLO  DE MAQUINA 1/2'' X 10''","categoria":"Accesorios","stock_sap":0,"stock_chm":8,"stock_total":8,"consumo_mensual":2,"dias_disponibles":120,"estado":"SUFICIENTE"},{"articulo":1003206,"descripcion":"MOD. INTEGRADO TRANSF. 1F 7,2KV R5-10/5A","categoria":"Otros","stock_sap":4,"stock_chm":0,"stock_total":4,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004233,"descripcion":"ALARGADERA 10\" PARA CADENA AISLADORES","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004235,"descripcion":"GRAPA AMARRE ALUMINIO COND. AWG 4/0-MCM 266","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004315,"descripcion":"PICA DE PUESTA A TIERRA 5/8\"X8'","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003198,"descripcion":"MOD. INTEG. TRANSF. 3F 12,47kV R10-20/5A","categoria":"Otros","stock_sap":5,"stock_chm":0,"stock_total":5,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004236,"descripcion":"GRAPA AMARRE ALUMINIO COND. MCM 477 (HAWK)","categoria":"Accesorios","stock_sap":0,"stock_chm":3,"stock_total":3,"consumo_mensual":1,"dias_disponibles":150,"estado":"SUFICIENTE"},{"articulo":1002843,"descripcion":"TORNILLO  DE MAQUINA 1/2' X 3'","categoria":"Accesorios","stock_sap":0,"stock_chm":1012,"stock_total":1012,"consumo_mensual":76,"dias_disponibles":397,"estado":"SUFICIENTE"},{"articulo":1004082,"descripcion":"SELLO DOBLE ANCLA COLOR NARANJA","categoria":"Sellos","stock_sap":114761,"stock_chm":3528,"stock_total":118289,"consumo_mensual":21151,"dias_disponibles":168,"estado":"SUFICIENTE"},{"articulo":1004314,"descripcion":"BRIDA DE SUJECION PLASTICA 9 mm X 360 mm","categoria":"Accesorios","stock_sap":5563,"stock_chm":4603,"stock_total":10166,"consumo_mensual":10216,"dias_disponibles":30,"estado":"CRITICO"},{"articulo":1002913,"descripcion":"CONTADOR 120V.ELECTRONICO","categoria":"Medidores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003144,"descripcion":"CONECTOR A 90°CU PALA CABLE 4/0-477","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003197,"descripcion":"MOD. INTEG. TRANSF. 3F 12,47kV R5-10/5A","categoria":"Otros","stock_sap":6,"stock_chm":0,"stock_total":6,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004281,"descripcion":"TERMINAL COMP. TIPO PIN PARA COND. 4/0 A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004077,"descripcion":"SELLO DOBLE ANCLA COLOR AMARILLO","categoria":"Sellos","stock_sap":3000,"stock_chm":0,"stock_total":3000,"consumo_mensual":3476,"dias_disponibles":26,"estado":"CRITICO"},{"articulo":1003912,"descripcion":"BASE CL 200 RESID.FORM-2S C/PERNO D/SEGU","categoria":"Conectores/Bases","stock_sap":479,"stock_chm":223,"stock_total":702,"consumo_mensual":99,"dias_disponibles":213,"estado":"SUFICIENTE"},{"articulo":1002921,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 8,2 ROSC 1\"","categoria":"Conectores/Bases","stock_sap":21423,"stock_chm":59,"stock_total":21482,"consumo_mensual":3260,"dias_disponibles":198,"estado":"SUFICIENTE"},{"articulo":1003282,"descripcion":"TORNILLO CABEZA DE HONGO 1/2\"*4 1/2\"","categoria":"Accesorios","stock_sap":0,"stock_chm":7,"stock_total":7,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002920,"descripcion":"BASE CIRCULAR, ENTRADA DE 1\"","categoria":"Conectores/Bases","stock_sap":40853,"stock_chm":5878,"stock_total":46731,"consumo_mensual":5647,"dias_disponibles":248,"estado":"SUFICIENTE"},{"articulo":1003414,"descripcion":"ABRAZADERA METALICA TIPO OMEGA DE 1\"","categoria":"Otros","stock_sap":0,"stock_chm":85,"stock_total":85,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004294,"descripcion":"FUSIBLE DE EXPULSION 5 A TIPO D","categoria":"Otros","stock_sap":0,"stock_chm":8,"stock_total":8,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004296,"descripcion":"FUSIBLE DE EXPULSION 10 A TIPO D","categoria":"Otros","stock_sap":0,"stock_chm":8,"stock_total":8,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004373,"descripcion":"TORNILLO DE ESPACIAMIENTO AC.GALV.5-8X12","categoria":"Accesorios","stock_sap":0,"stock_chm":193,"stock_total":193,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004748,"descripcion":"TERMINAL COMP. T/PIN CORTO COND 2/0 AWG","categoria":"Otros","stock_sap":0,"stock_chm":8,"stock_total":8,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004604,"descripcion":"CONDUCTOR MULTIFIBRA 35 MM²","categoria":"Conductores","stock_sap":921,"stock_chm":596,"stock_total":1517,"consumo_mensual":127,"dias_disponibles":358,"estado":"SUFICIENTE"},{"articulo":1002929,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 6,3 ROSC 1\"","categoria":"Conectores/Bases","stock_sap":20994,"stock_chm":8735,"stock_total":29729,"consumo_mensual":3129,"dias_disponibles":285,"estado":"SUFICIENTE"},{"articulo":1003053,"descripcion":"ARANDELA PLANA REDONDA ACERO GALV.1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":9,"stock_total":9,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003152,"descripcion":"TORNILLO MAQUINA AC. GALV.C.CUAD.5-8X12","categoria":"Accesorios","stock_sap":285,"stock_chm":128,"stock_total":413,"consumo_mensual":41,"dias_disponibles":304,"estado":"SUFICIENTE"},{"articulo":1008464,"descripcion":"COLECTOR  PARA MUDULO DE MEDICION CONCEN","categoria":"Otros","stock_sap":130,"stock_chm":86,"stock_total":216,"consumo_mensual":48,"dias_disponibles":134,"estado":"SUFICIENTE"},{"articulo":1003703,"descripcion":"TUERCA HEXAGONAL ACERO INOXIDABLE DE 1/2'.","categoria":"Otros","stock_sap":0,"stock_chm":20,"stock_total":20,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004295,"descripcion":"FUSIBLE DE EXPULSION 7 A TIPO D","categoria":"Otros","stock_sap":0,"stock_chm":10,"stock_total":10,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004377,"descripcion":"CONDUCTOR COBRE AISLADO #4 AWG","categoria":"Conductores","stock_sap":0,"stock_chm":20,"stock_total":20,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002842,"descripcion":"FLEJES GALV. 1-3/4\"X1-3/4\"X3/16\"X60\"","categoria":"Otros","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004196,"descripcion":"MAIN BREAKER 2 POLOS 150 AMPERES","categoria":"Otros","stock_sap":0,"stock_chm":22,"stock_total":22,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002956,"descripcion":"ARO DE SEGURIDAD CON TORNILLO REFORZADO","categoria":"Accesorios","stock_sap":150292,"stock_chm":6825,"stock_total":157117,"consumo_mensual":14172,"dias_disponibles":333,"estado":"SUFICIENTE"},{"articulo":1003106,"descripcion":"TUBO DE PVC DIAMETRO 1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":57,"stock_total":57,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1005103,"descripcion":"FUSIBLE MTU TWACS 200A","categoria":"Otros","stock_sap":23,"stock_chm":0,"stock_total":23,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002860,"descripcion":"FUSIBLE EXPULSION TIPO K DE 140 A","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002867,"descripcion":"GRAPA DERIV 4/0AWG-1000MCM A 6AWG-300MCM","categoria":"Accesorios","stock_sap":0,"stock_chm":1,"stock_total":1,"consumo_mensual":0,"dias_disponibles":300,"estado":"SUFICIENTE"},{"articulo":1002988,"descripcion":"CONECTOR PERNO PARTIDO CU #2AWG","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":10,"stock_total":10,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003887,"descripcion":"SELLOS PARA FUNDAS PRECINTABLES","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004008,"descripcion":"ARO REFOZA.CON DISPOSI.P/CANDADO TIPO PERNO","categoria":"Accesorios","stock_sap":0,"stock_chm":4,"stock_total":4,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004277,"descripcion":"FUSIBLE EXPULSION 80 A TIPO K","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004317,"descripcion":"CONECTOR CU$A A PRESI\"N MCM477/AGW4/0","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008833,"descripcion":"GRAPA PARA CONDUCTOR DUPLO # 14 AWG","categoria":"Conductores","stock_sap":0,"stock_chm":24,"stock_total":24,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1010631,"descripcion":"CONDUCTOR CONCENTRICO AL/CU 2X8","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1014569,"descripcion":"BASE CIRCULAR POLICARBONATO- ENTRADA 1","categoria":"Conectores/Bases","stock_sap":662,"stock_chm":409,"stock_total":1071,"consumo_mensual":79,"dias_disponibles":408,"estado":"SUFICIENTE"},{"articulo":1003194,"descripcion":"CONECTOR CURVO PARA TUBERIA FLEXIBLE 2\"","categoria":"Conectores/Bases","stock_sap":98,"stock_chm":65,"stock_total":163,"consumo_mensual":12,"dias_disponibles":408,"estado":"SUFICIENTE"},{"articulo":1003189,"descripcion":"TERMINAL DE COBRE 25-12","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003736,"descripcion":"TERMINAL DE COBRE 70-12","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1012147,"descripcion":"CINTA ADHESIVA P/ROTULAR DE 1/2","categoria":"Accesorios","stock_sap":0,"stock_chm":282,"stock_total":282,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004345,"descripcion":"CONECTOR COMPRESION PICA AWG #2","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":99,"stock_total":99,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003623,"descripcion":"CONDULEX DE 3\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004078,"descripcion":"SELLO DOBLE ANCLA COLOR AZUL","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004374,"descripcion":"TORNILLO DE ESPACIAMIENTO AC.GALV.5-8X14","categoria":"Accesorios","stock_sap":0,"stock_chm":310,"stock_total":310,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1005076,"descripcion":"ABRAZADERA UNITRON 1 1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003549,"descripcion":"BRIDA DE SUJECIÓN PLÁSTICA 12\"","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004084,"descripcion":"SELLO DOBLE ANCLA COLOR VERDE","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":442296,"descripcion":"SELLO TOOLLESS ROTO SEAL_AMARILLO (SELLO)","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":442297,"descripcion":"SELLO TOOLLESS ROTO SEAL NARANJA (SELLO)","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":446716,"descripcion":"SELLO TOOLLESS ROTO SEAL BLANCO (SELLO)","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":446720,"descripcion":"SELLO TOOLLESS ROTO SEAL VERDE (SELLO)","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002903,"descripcion":"CASCO PARA LINIERO (PROTECCION)","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002941,"descripcion":"TORNILLO TIRAF.RETE. DE 5/16\"POR 3,5\"LO","categoria":"Accesorios","stock_sap":7028,"stock_chm":20,"stock_total":7048,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002945,"descripcion":"HEBILLAS PARA FLEJE DE 20MM(3/4\")","categoria":"Otros","stock_sap":3196,"stock_chm":79,"stock_total":3275,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002950,"descripcion":"ADAPTADORES DE PVC 1\" HEMBRA","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003023,"descripcion":"CABLE COBRE AISLAD THHN COLOR VERDE 4mm²","categoria":"Conductores","stock_sap":2284,"stock_chm":0,"stock_total":2284,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003063,"descripcion":"TUERCA HEXAGONAL ACERO GALVANIZADO1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003176,"descripcion":"CABLE COBRE AISLAD THHN COLOR NEGRO 6mm²","categoria":"Conductores","stock_sap":10719,"stock_chm":0,"stock_total":10719,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003177,"descripcion":"CABLE COBRE AISLA THHN COLOR MARRON 6mm²","categoria":"Conductores","stock_sap":8865,"stock_chm":0,"stock_total":8865,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003190,"descripcion":"TERMINAL DE COBRE ESTAÑADO 35 mm²","categoria":"Otros","stock_sap":3721,"stock_chm":4,"stock_total":3725,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003224,"descripcion":"GRAPA CONEXION DOBLE CABLE TIERRA SIN TO","categoria":"Conductores","stock_sap":25918,"stock_chm":0,"stock_total":25918,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003293,"descripcion":"SELLO ENDURO SEAL COLOR MARRON (SELLO )","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003319,"descripcion":"SELLO MULTI-LOCK COLOR MARRON","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003383,"descripcion":"CANALETA PLASTICA DE 2.5 MTS X 2\"X 1\"","categoria":"Otros","stock_sap":6814,"stock_chm":0,"stock_total":6814,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003399,"descripcion":"TORNILLO CABEZA HEXAGONAL 1\"1/2 X 1/2\"","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003416,"descripcion":"TERMINAL DE COBRE 70-10","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003456,"descripcion":"CABLE DE CONTROL SJTW  10 X 3 HILOS","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003487,"descripcion":"CABLE DE CONTROL SJTW 12 X 8 HILOS","categoria":"Conductores","stock_sap":0,"stock_chm":540,"stock_total":540,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004210,"descripcion":"TORNILLO TIRAFONDO AC GALVAN 5-16' X 1","categoria":"Accesorios","stock_sap":0,"stock_chm":1401,"stock_total":1401,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004217,"descripcion":"PERNOS SEGURI CABEZA MAGNET TRES ESFERA","categoria":"Otros","stock_sap":49211,"stock_chm":0,"stock_total":49211,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004226,"descripcion":"CONDUCTOR CONCENTRICO 2XN§10 COBRE","categoria":"Conductores","stock_sap":0,"stock_chm":2,"stock_total":2,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004313,"descripcion":"BRIDA DE SUJECION PLASTICA 9 mm X 175 mm","categoria":"Accesorios","stock_sap":47624,"stock_chm":150,"stock_total":47774,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004326,"descripcion":"CONDUCTOR CONCENTRICO 2XN'8 COBRE","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004327,"descripcion":"CONDUCTOR CONCENTRICO 3XN§8 COBRE","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004333,"descripcion":"CONDUCTOR CONCENTRICO 3XN'6 COBRE","categoria":"Conductores","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004378,"descripcion":"FLEJE DE SUJECCION 20X0,7 MM","categoria":"Otros","stock_sap":912,"stock_chm":0,"stock_total":912,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004583,"descripcion":"SELLO ENDURO SEAL COLOR AMARILLO (SELLO)","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004606,"descripcion":"CONDUCTOR MULTIFIBRA 25 MM²","categoria":"Conductores","stock_sap":20431,"stock_chm":0,"stock_total":20431,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004644,"descripcion":"CONDUCTOR MULTIFIBRAS 95 MM² 600V","categoria":"Conductores","stock_sap":9084,"stock_chm":0,"stock_total":9084,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008836,"descripcion":"CONDUCTOR DUPLO # 14 AWG","categoria":"Conductores","stock_sap":50818,"stock_chm":205,"stock_total":51023,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1012026,"descripcion":"TUERCA HEX.ACERO GALV. 12MM","categoria":"Otros","stock_sap":41781,"stock_chm":221,"stock_total":42002,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003250,"descripcion":"ADAPTADORES DE PVC 1\" MACHO","categoria":"Otros","stock_sap":1605,"stock_chm":206,"stock_total":1811,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003381,"descripcion":"BAQUELITA O MORDAZA N° 2","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004611,"descripcion":"TORNILLO CABEZA HEXAGONAL 5/8\" X 10\"","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004825,"descripcion":"BREAKERS 2X63 AMP.","categoria":"Otros","stock_sap":2955,"stock_chm":0,"stock_total":2955,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004858,"descripcion":"TORNILLO AC. GALV. C. ESTRIA 1/8¿¿ X 1 ½","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002955,"descripcion":"TAPAS CIEGAS","categoria":"Otros","stock_sap":1085,"stock_chm":221,"stock_total":1306,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003182,"descripcion":"TUBERIA DE PVC, DIAMETRO 1\" SCHEDULE 40","categoria":"Otros","stock_sap":588,"stock_chm":130,"stock_total":718,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004332,"descripcion":"ABRAZADERA OMEGA PARA TUBO 50 MM","categoria":"Otros","stock_sap":0,"stock_chm":705,"stock_total":705,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004261,"descripcion":"RETENCION TERM.PREFORMADA CABLE ACERO 3/8\"","categoria":"Conductores","stock_sap":0,"stock_chm":750,"stock_total":750,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002965,"descripcion":"CONECTOR DE COBRE ESTAÑADO P/PART.2/0 AW","categoria":"Conectores/Bases","stock_sap":127,"stock_chm":0,"stock_total":127,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004381,"descripcion":"TERMINAL D/COMP. BIMT PLETINA. 4/0 AWG,1","categoria":"Otros","stock_sap":3,"stock_chm":0,"stock_total":3,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004044,"descripcion":"TARUGO PLASTICO DE 3/8’’X 1 1/2’’","categoria":"Accesorios","stock_sap":92128,"stock_chm":16516,"stock_total":108644,"consumo_mensual":8338,"dias_disponibles":391,"estado":"SUFICIENTE"},{"articulo":1002935,"descripcion":"CONECTOR NEUT/DES. D/INDEP. P/ACOM.","categoria":"Conectores/Bases","stock_sap":42389,"stock_chm":8071,"stock_total":50460,"consumo_mensual":3691,"dias_disponibles":410,"estado":"SUFICIENTE"},{"articulo":1010466,"descripcion":"GRAPA PARA CABLE COAXIAL 6MM","categoria":"Conductores","stock_sap":0,"stock_chm":142,"stock_total":142,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003730,"descripcion":"CAJA DE 18 ACOM. (18 A 120V Y 9 A 240V","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004007,"descripcion":"ARMARIO METALICO PARA MEDIDA INDIRECTA","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1005074,"descripcion":"CONDULET 1 1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":26,"stock_total":26,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1009638,"descripcion":"CAJA POLIC. P-MED T-SOC CON BREAK 40-2A.","categoria":"Otros","stock_sap":0,"stock_chm":13,"stock_total":13,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002966,"descripcion":"BAQUELITAS O MORDAZAS CL100.","categoria":"Otros","stock_sap":4384,"stock_chm":1634,"stock_total":6018,"consumo_mensual":357,"dias_disponibles":505,"estado":"SUFICIENTE"},{"articulo":1004319,"descripcion":"CONECTOR CU$A A PRESI\"N AGW 4/0-AGW 4/0","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1003921,"descripcion":"CONEC. A PRU. DE AGUA P/C.8/2 ROSC.1 1/4","categoria":"Otros","stock_sap":0,"stock_chm":67,"stock_total":67,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004198,"descripcion":"INTERRUPTOR TERMOM. PT. 2P 100A","categoria":"Otros","stock_sap":0,"stock_chm":41,"stock_total":41,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":2002576,"descripcion":"TUBO GALVANIZADO 1-1/2\"X 15'","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004177,"descripcion":"CABLE DE CONTROL SJTW 10 X 4 HILOS","categoria":"Conductores","stock_sap":55,"stock_chm":0,"stock_total":55,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008538,"descripcion":"TRANSF CORRIENTE BT 600-5A 600V CABLEADO","categoria":"Conductores","stock_sap":10,"stock_chm":32,"stock_total":42,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002841,"descripcion":"FLEJES GALV. 1-1/4\"X1/4\"X28\" ORIF 9/16\"","categoria":"Otros","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":9002956,"descripcion":"AROS DE SEGURIDAD CON TORNILLO-RE","categoria":"Accesorios","stock_sap":0,"stock_chm":31,"stock_total":31,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1002837,"descripcion":"CINTA DIELECTRICA SELLADORA 19 MM X 10 M","categoria":"Accesorios","stock_sap":10300,"stock_chm":2447,"stock_total":12747,"consumo_mensual":746,"dias_disponibles":512,"estado":"SUFICIENTE"},{"articulo":1003154,"descripcion":"TORNILLO AC.GALVANIZ.C/EXAG.C/T.5/8\"X16\"","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004205,"descripcion":"TORNILLO AC.GALVANIZADO CON OJO.C.T.5/8X14\"----","categoria":"Accesorios","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008714,"descripcion":"MEDIDOR TELEM PLC 120-240 V, C20  3H T-S","categoria":"Medidores","stock_sap":8451,"stock_chm":124,"stock_total":8575,"consumo_mensual":496,"dias_disponibles":519,"estado":"SUFICIENTE"},{"articulo":1004628,"descripcion":"CONDUCT.CONCENTRICOS 3XN2 AWG ALUM.","categoria":"Conductores","stock_sap":740,"stock_chm":19,"stock_total":759,"consumo_mensual":42,"dias_disponibles":542,"estado":"SUFICIENTE"},{"articulo":1004503,"descripcion":"CONECTOR DE PERFORACION DE FASE","categoria":"Conectores/Bases","stock_sap":126182,"stock_chm":12292,"stock_total":138474,"consumo_mensual":7633,"dias_disponibles":544,"estado":"SUFICIENTE"},{"articulo":1003012,"descripcion":"TORNILLO ROSCA MADERA 1/2\"X4 1/2\"","categoria":"Accesorios","stock_sap":0,"stock_chm":18,"stock_total":18,"consumo_mensual":0,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1004321,"descripcion":"CONECTOR CU$A A PRESI\"N AGW4/0 - N'2 CU","categoria":"Conectores/Bases","stock_sap":0,"stock_chm":30,"stock_total":30,"consumo_mensual":2,"dias_disponibles":529,"estado":"SUFICIENTE"},{"articulo":1003739,"descripcion":"CAJA 12 ACOM. (12 A 120V Y 6 A 240V)","categoria":"Otros","stock_sap":0,"stock_chm":82,"stock_total":82,"consumo_mensual":3,"dias_disponibles":820,"estado":"SUFICIENTE"},{"articulo":1003958,"descripcion":"MEDIDOR 120 V, TELEM PLC 3H T-SOCKET","categoria":"Medidores","stock_sap":389,"stock_chm":0,"stock_total":389,"consumo_mensual":19,"dias_disponibles":611,"estado":"SUFICIENTE"},{"articulo":1004507,"descripcion":"TERMINAL DE COBRE ESTAÑADO 70 mm²","categoria":"Otros","stock_sap":406,"stock_chm":3723,"stock_total":4129,"consumo_mensual":98,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003248,"descripcion":"CONECTOR CURVO PARA TUBERIA FLEXIBLE 1\"","categoria":"Conectores/Bases","stock_sap":628,"stock_chm":180,"stock_total":808,"consumo_mensual":29,"dias_disponibles":833,"estado":"SUFICIENTE"},{"articulo":1003180,"descripcion":"PINZA DE RETENCION DOBLE","categoria":"Accesorios","stock_sap":182452,"stock_chm":7001,"stock_total":189453,"consumo_mensual":7963,"dias_disponibles":714,"estado":"SUFICIENTE"},{"articulo":1014804,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN MARRON","categoria":"Sellos","stock_sap":247419,"stock_chm":30534,"stock_total":277953,"consumo_mensual":10123,"dias_disponibles":824,"estado":"SUFICIENTE"},{"articulo":1002946,"descripcion":"TUBERÍA FLEXIBLE 1\" CON PROTECC PVC, LIQ","categoria":"Otros","stock_sap":4900,"stock_chm":818,"stock_total":5718,"consumo_mensual":178,"dias_disponibles":963,"estado":"SUFICIENTE"},{"articulo":1002846,"descripcion":"TORNILLO ESPAC ROSCA CORRIDA 5/8\"X10\"","categoria":"Accesorios","stock_sap":0,"stock_chm":50,"stock_total":50,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002927,"descripcion":"BASE CL 200 INDUSTRIAL, FORMA 16S","categoria":"Conectores/Bases","stock_sap":568,"stock_chm":11,"stock_total":579,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002939,"descripcion":"MENSULA OJAL DE ACOMETIDA","categoria":"Accesorios","stock_sap":26649,"stock_chm":977,"stock_total":27626,"consumo_mensual":7,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002940,"descripcion":"MOLDURA PLASTICA P/TIERRA 1/2\"X 8'","categoria":"Accesorios","stock_sap":1223,"stock_chm":1632,"stock_total":2855,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002943,"descripcion":"FLEJE DE AC INOX DE 12.7MM (1/2\") X 0.4M","categoria":"Otros","stock_sap":33239,"stock_chm":925,"stock_total":34164,"consumo_mensual":52,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002944,"descripcion":"HEBILLAS PARA FLEJE DE 12.7MM(1/2\")","categoria":"Otros","stock_sap":49378,"stock_chm":1378,"stock_total":50756,"consumo_mensual":31,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002952,"descripcion":"CONDULET DE 2\"","categoria":"Otros","stock_sap":1325,"stock_chm":490,"stock_total":1815,"consumo_mensual":9,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1002981,"descripcion":"ARANDELA PLANA CUADRADA 2'''","categoria":"Otros","stock_sap":52679,"stock_chm":552,"stock_total":53231,"consumo_mensual":9,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003003,"descripcion":"SOPORTE DE ANCLAJE EN FACHADA","categoria":"Accesorios","stock_sap":73417,"stock_chm":8753,"stock_total":82170,"consumo_mensual":1267,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003014,"descripcion":"TORNILLO TIRAFONDO 3-16'' X 1 1-2''","categoria":"Accesorios","stock_sap":0,"stock_chm":140,"stock_total":140,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003022,"descripcion":"VARILLA PUESTA A TIERRA GALV. 1/2\" X 6\"","categoria":"Otros","stock_sap":0,"stock_chm":63,"stock_total":63,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003026,"descripcion":"TORNILLO CABEZA HEXAGONAL 3/8\"X 2\"","categoria":"Accesorios","stock_sap":0,"stock_chm":300,"stock_total":300,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003029,"descripcion":"CONECTOR 5/8 P/VARILLA D/TIERRA","categoria":"Conectores/Bases","stock_sap":23742,"stock_chm":6833,"stock_total":30575,"consumo_mensual":4,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003068,"descripcion":"ABRAZADERA  METALICA TIPO OMEGA DE1/2\"","categoria":"Otros","stock_sap":551038,"stock_chm":11460,"stock_total":562498,"consumo_mensual":6,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003085,"descripcion":"TRANSF DE CORRIENTE BT 200-5A 600V","categoria":"Otros","stock_sap":1427,"stock_chm":0,"stock_total":1427,"consumo_mensual":6,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003104,"descripcion":"TARUGO PLASTICO DE 1-4’’ X 1 1-2”","categoria":"Accesorios","stock_sap":545522,"stock_chm":7552,"stock_total":553074,"consumo_mensual":5,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003105,"descripcion":"CABLE DE TIERRA # 6","categoria":"Conductores","stock_sap":0,"stock_chm":1102,"stock_total":1102,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003118,"descripcion":"TERMINAL D/OJO AMARILL P/C.10-12 CERRADO","categoria":"Otros","stock_sap":36384,"stock_chm":5016,"stock_total":41400,"consumo_mensual":369,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003161,"descripcion":"ARANDELA PLANA RECTANGULAR 5-8","categoria":"Otros","stock_sap":27106,"stock_chm":612,"stock_total":27718,"consumo_mensual":25,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003162,"descripcion":"TUERCA DE OJO ACERO GALVANIZADO 5/8\"","categoria":"Otros","stock_sap":0,"stock_chm":787,"stock_total":787,"consumo_mensual":16,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003175,"descripcion":"SOPORTE HORQUILLA PARA AISLADOR TIPO CARRETE","categoria":"Accesorios","stock_sap":0,"stock_chm":60,"stock_total":60,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003178,"descripcion":"CABLE COBRE AISLADO THHN COLOR AZUL 6mm²","categoria":"Conductores","stock_sap":5757,"stock_chm":0,"stock_total":5757,"consumo_mensual":15,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003181,"descripcion":"VARILLA DE TIERRA DIAM. 5/8'' X 6'","categoria":"Otros","stock_sap":14400,"stock_chm":2859,"stock_total":17259,"consumo_mensual":4,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003186,"descripcion":"TERMINAL DE COBRE ESTAÑADO 16 mm²","categoria":"Otros","stock_sap":490,"stock_chm":1038,"stock_total":1528,"consumo_mensual":4,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003193,"descripcion":"CONECTOR RECTO P/TUBERÍA FLEXIBLE 2\" LIQ","categoria":"Conectores/Bases","stock_sap":2950,"stock_chm":378,"stock_total":3328,"consumo_mensual":11,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003195,"descripcion":"TUBERIA FLEXIBLE 2\"","categoria":"Otros","stock_sap":2835,"stock_chm":642,"stock_total":3477,"consumo_mensual":36,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003196,"descripcion":"CONDULET DE 1\"","categoria":"Otros","stock_sap":3573,"stock_chm":303,"stock_total":3876,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003209,"descripcion":"TARUGO EXPANSION PLOMO 1/2\" P/TORN 5/16\"","categoria":"Accesorios","stock_sap":0,"stock_chm":4443,"stock_total":4443,"consumo_mensual":20,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003227,"descripcion":"ARANDELA PRESION AC.GALV. 5-8","categoria":"Otros","stock_sap":137560,"stock_chm":567,"stock_total":138127,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003242,"descripcion":"TORNILLO TIRAFONDO 1/8\" X 1 1/4”","categoria":"Accesorios","stock_sap":23777,"stock_chm":568,"stock_total":24345,"consumo_mensual":376,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003243,"descripcion":"TORNILLO TIRAFONDO  1- 4'' X 1 1-2''","categoria":"Accesorios","stock_sap":1943789,"stock_chm":14413,"stock_total":1958202,"consumo_mensual":5591,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003244,"descripcion":"TORNILLO CABEZA HEX. 5/16\" X 1 1/2\"","categoria":"Accesorios","stock_sap":0,"stock_chm":12,"stock_total":12,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003475,"descripcion":"BREAKER DE 40A DOBLE","categoria":"Otros","stock_sap":0,"stock_chm":164,"stock_total":164,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003706,"descripcion":"ARANDELA PLANA REDONDA ACERO INOX.5/8\"","categoria":"Otros","stock_sap":564,"stock_chm":61,"stock_total":625,"consumo_mensual":10,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003791,"descripcion":"TUBERIA FLEXIBLE LIQUID TIGHT DE 3\"","categoria":"Otros","stock_sap":544,"stock_chm":0,"stock_total":544,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003797,"descripcion":"TUBO GALV. 2\" X 10'","categoria":"Otros","stock_sap":1802,"stock_chm":36,"stock_total":1838,"consumo_mensual":25,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003832,"descripcion":"TARUGO PLASTICO DE 5-16’’ X 2’’","categoria":"Accesorios","stock_sap":76982,"stock_chm":4079,"stock_total":81061,"consumo_mensual":1176,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003986,"descripcion":"PERNO REVPRO ACERO INOXIDABLE.","categoria":"Otros","stock_sap":1279,"stock_chm":3214,"stock_total":4493,"consumo_mensual":95,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004000,"descripcion":"BAQUELITA CL 200 INDUSTRIAL FORM-16S","categoria":"Otros","stock_sap":468,"stock_chm":1,"stock_total":469,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004037,"descripcion":"BAQUELITA CL 200 RESIDENCIAL FORMA 2S","categoria":"Otros","stock_sap":10401,"stock_chm":1048,"stock_total":11449,"consumo_mensual":14,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004038,"descripcion":"ABRAZADERA UNITRON  TUBO 2''","categoria":"Otros","stock_sap":123658,"stock_chm":4402,"stock_total":128060,"consumo_mensual":20,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004050,"descripcion":"RIEL DE BARRA UNITRON 1 3/4\" X 1 3/4\"","categoria":"Otros","stock_sap":0,"stock_chm":222,"stock_total":222,"consumo_mensual":12,"dias_disponibles":537,"estado":"SUFICIENTE"},{"articulo":1004079,"descripcion":"SELLO DOBLE ANCLA COLOR BLANCO","categoria":"Sellos","stock_sap":48908,"stock_chm":0,"stock_total":48908,"consumo_mensual":40,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004081,"descripcion":"SELLO DOBLE ANCLA COLOR MORADO","categoria":"Sellos","stock_sap":709551,"stock_chm":9816,"stock_total":719367,"consumo_mensual":55,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004109,"descripcion":"TRANSF.DE INTENSIDAD R.200/400.5 600V.60","categoria":"Otros","stock_sap":20548,"stock_chm":662,"stock_total":21210,"consumo_mensual":447,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004132,"descripcion":"CABLE ACERO COBREADO DESNUDO #2 AWG 7 HI","categoria":"Conductores","stock_sap":55554,"stock_chm":15,"stock_total":55569,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004148,"descripcion":"BRIDA DE SUJECION PLASTICA 5 mm X 152 mm","categoria":"Accesorios","stock_sap":974088,"stock_chm":130,"stock_total":974218,"consumo_mensual":24,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004208,"descripcion":"KIT DE BLINDAJE ELECTRICO","categoria":"Otros","stock_sap":2457,"stock_chm":5,"stock_total":2462,"consumo_mensual":9,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004211,"descripcion":"TARUGO PLASTICO DE 3-8’’ X 2\"","categoria":"Accesorios","stock_sap":8011,"stock_chm":5262,"stock_total":13273,"consumo_mensual":350,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004213,"descripcion":"CABLE DE ACERO COBREADO #6 AWG 3 HILOS","categoria":"Conductores","stock_sap":432277,"stock_chm":6722,"stock_total":438999,"consumo_mensual":6,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004214,"descripcion":"TARUGO PLASTICO 5/16’’ X 1 1/2\"","categoria":"Accesorios","stock_sap":1464957,"stock_chm":2960,"stock_total":1467917,"consumo_mensual":104,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004222,"descripcion":"CAJA P/MEDIDOR POLICARBONATO","categoria":"Medidores","stock_sap":1748,"stock_chm":202,"stock_total":1950,"consumo_mensual":4,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004228,"descripcion":"MAIN BREAKER 3 POLOS 300 AMPERES","categoria":"Otros","stock_sap":0,"stock_chm":20,"stock_total":20,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004234,"descripcion":"GRAPA AMARRE ALUM PARA COND. AWG 1/0 RAV","categoria":"Accesorios","stock_sap":3338,"stock_chm":0,"stock_total":3338,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004266,"descripcion":"TORNILLO MAQUINA AC.GALV.C.HEXAG. 5-8x3","categoria":"Accesorios","stock_sap":5116,"stock_chm":131,"stock_total":5247,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004289,"descripcion":"ARANDELA PLANA REDONDA AC.INOX. 1/2\"","categoria":"Otros","stock_sap":0,"stock_chm":3779,"stock_total":3779,"consumo_mensual":0,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004379,"descripcion":"CAJA DERIVACIàN MONOFASICA 9 SAL. 1000V","categoria":"Otros","stock_sap":3542,"stock_chm":41,"stock_total":3583,"consumo_mensual":34,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004546,"descripcion":"INTERRUPTOR TERMOMAG. 2P 50 A","categoria":"Otros","stock_sap":44854,"stock_chm":409,"stock_total":45263,"consumo_mensual":20,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004570,"descripcion":"CONTADOR NETWORK TWACS REPARADO","categoria":"Medidores","stock_sap":438,"stock_chm":0,"stock_total":438,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004588,"descripcion":"SOPORTE P/CAJA DERIV. 9\"X19\"X1-3/4\"X5/16","categoria":"Accesorios","stock_sap":434,"stock_chm":251,"stock_total":685,"consumo_mensual":11,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004949,"descripcion":"BRIDA DE SUJECION PLASTICA 5 mm X 102 mm","categoria":"Accesorios","stock_sap":74948,"stock_chm":10759,"stock_total":85707,"consumo_mensual":8,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008462,"descripcion":"DISPLAY PARA MEDIDOR PREPAGO","categoria":"Medidores","stock_sap":39714,"stock_chm":966,"stock_total":40680,"consumo_mensual":304,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1008466,"descripcion":"MODULO DE MEDICION CONCENTRADA","categoria":"Otros","stock_sap":2065,"stock_chm":48,"stock_total":2113,"consumo_mensual":37,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1010706,"descripcion":"UNIÓN DE EMP BIMETÁLICO T/MANGUITO AWG 6","categoria":"Otros","stock_sap":499693,"stock_chm":9997,"stock_total":509690,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012155,"descripcion":"TORNILLO TIRAFONDO 5/16'' X 2 ''","categoria":"Accesorios","stock_sap":28178,"stock_chm":100,"stock_total":28278,"consumo_mensual":10,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012156,"descripcion":"TORNILLO TIRAFONDO 1/4'' X 2 ''","categoria":"Accesorios","stock_sap":123681,"stock_chm":0,"stock_total":123681,"consumo_mensual":40,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012446,"descripcion":"TORNILLO TIRAFONDO  1- 4'' X 1'' V","categoria":"Accesorios","stock_sap":98386,"stock_chm":4892,"stock_total":103278,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1012959,"descripcion":"TORNILLO AUTO PERFORANTE 1-4 X 1 1/2","categoria":"Accesorios","stock_sap":31774,"stock_chm":1810,"stock_total":33584,"consumo_mensual":37,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013465,"descripcion":"MODULO DE MEDICION CONCENTRADA 8","categoria":"Otros","stock_sap":620,"stock_chm":10,"stock_total":630,"consumo_mensual":3,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013466,"descripcion":"MODULO DE MEDICION CONCENTRADA 12","categoria":"Otros","stock_sap":386,"stock_chm":28,"stock_total":414,"consumo_mensual":5,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1013506,"descripcion":"TUBO DE  ACERO GALVANIZADO DE 2\" X 15'","categoria":"Otros","stock_sap":4844,"stock_chm":12,"stock_total":4856,"consumo_mensual":26,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1014856,"descripcion":"MED. TELEM PLC C-TEL 120-208V, 3H T-SOCK","categoria":"Medidores","stock_sap":379,"stock_chm":0,"stock_total":379,"consumo_mensual":3,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1016271,"descripcion":"LIMIT SWITCH PARA MODULO CONCENTRACION","categoria":"Otros","stock_sap":0,"stock_chm":260,"stock_total":260,"consumo_mensual":3,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":2000368,"descripcion":"TOMA CORRIENTE DOBLE 15A./110V.","categoria":"Otros","stock_sap":0,"stock_chm":294,"stock_total":294,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":2010886,"descripcion":"CAJA RECTANGULAR 2X4 TOMACORRIENTE","categoria":"Otros","stock_sap":0,"stock_chm":532,"stock_total":532,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":2010888,"descripcion":"TAPA PARA TOMACORRIENTE","categoria":"Otros","stock_sap":0,"stock_chm":327,"stock_total":327,"consumo_mensual":2,"dias_disponibles":999,"estado":"SUFICIENTE"}],"categorias":["Accesorios","Conductores","Conectores/Bases","Medidores","Otros","Sellos"],"por_estado":{"CRITICO":158,"SUFICIENTE":114,"BAJO":6,"NORMAL":1},"kit":{"articulos":[1002920,1002921,1002929,1002942,1002956,1003003,1003180,1003243,1003913,1003957,1003958,1004044,1004080,1004081,1004082,1004314,1004503,1004570,1004574,1004627,1004629,1008463,1008465,1008714,1008984,1008985,1009636,1011423,1011875,1012965,1013434,1013612,1014804],"total":33,"criticos":12,"bajos":3,"normales":1,"suficientes":17,"materiales":[{"articulo":1004080,"descripcion":"SELLO DOBLE ANCLA COLOR MARRÓN","categoria":"Sellos","stock_sap":0,"stock_chm":30,"stock_total":30,"consumo_mensual":7284,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1008984,"descripcion":"MEDIDOR TELEM PLC C-TEL 240V, 3H T-SOCK","categoria":"Medidores","stock_sap":1,"stock_chm":14,"stock_total":15,"consumo_mensual":13082,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1011423,"descripcion":"BASE PORTA MEDIDOR SOCKET INDIRECT FM 4S","categoria":"Medidores","stock_sap":0,"stock_chm":10,"stock_total":10,"consumo_mensual":24,"dias_disponibles":12,"estado":"CRITICO"},{"articulo":1011875,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN","categoria":"Sellos","stock_sap":0,"stock_chm":128,"stock_total":128,"consumo_mensual":7714,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1012965,"descripcion":"SELLOS DE ALTA SEGURIDAD TIPO PIN MORRÓN","categoria":"Sellos","stock_sap":0,"stock_chm":0,"stock_total":0,"consumo_mensual":263,"dias_disponibles":0,"estado":"CRITICO"},{"articulo":1013612,"descripcion":"MED. TELEM PLC C-TEL 240V, 3H T-SOCK RC","categoria":"Medidores","stock_sap":32,"stock_chm":166,"stock_total":198,"consumo_mensual":517,"dias_disponibles":11,"estado":"CRITICO"},{"articulo":1002942,"descripcion":"COLLAR AMARRE EN FACHADA","categoria":"Accesorios","stock_sap":418,"stock_chm":5653,"stock_total":6071,"consumo_mensual":10117,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1009636,"descripcion":"MEDIDOR 120 V, TELEM PLC 2H T-SOCKET","categoria":"Medidores","stock_sap":0,"stock_chm":5,"stock_total":5,"consumo_mensual":101,"dias_disponibles":1,"estado":"CRITICO"},{"articulo":1008465,"descripcion":"MEDIDOR MODULAR PREPAGO 240VAC","categoria":"Medidores","stock_sap":273,"stock_chm":322,"stock_total":595,"consumo_mensual":1201,"dias_disponibles":15,"estado":"CRITICO"},{"articulo":1008463,"descripcion":"MEDIDOR MODULAR PREPAGO 120VAC","categoria":"Medidores","stock_sap":129,"stock_chm":61,"stock_total":190,"consumo_mensual":318,"dias_disponibles":18,"estado":"CRITICO"},{"articulo":1003957,"descripcion":"MEDIDOR 240 V, TELEM PLC 3H T-SOCKET","categoria":"Medidores","stock_sap":44,"stock_chm":0,"stock_total":44,"consumo_mensual":83,"dias_disponibles":16,"estado":"CRITICO"},{"articulo":1004574,"descripcion":"CONTADOR 240V.ELECTROMECANICO","categoria":"Medidores","stock_sap":232,"stock_chm":176,"stock_total":408,"consumo_mensual":325,"dias_disponibles":38,"estado":"BAJO"},{"articulo":1004629,"descripcion":"CONDUCT.CONCENTRICOS 2XN8 AWG ALUM.","categoria":"Conductores","stock_sap":15969,"stock_chm":15941,"stock_total":31910,"consumo_mensual":16185,"dias_disponibles":59,"estado":"BAJO"},{"articulo":1003913,"descripcion":"CONTADOR REC.240V.CL-200 3H.TWACS","categoria":"Medidores","stock_sap":752,"stock_chm":852,"stock_total":1604,"consumo_mensual":501,"dias_disponibles":96,"estado":"SUFICIENTE"},{"articulo":1013434,"descripcion":"Medidor 120V, Telem. PLC 2H T-SOCKER RC","categoria":"Medidores","stock_sap":2469,"stock_chm":921,"stock_total":3390,"consumo_mensual":1155,"dias_disponibles":88,"estado":"NORMAL"},{"articulo":1008985,"descripcion":"MEDIDOR TELEM PLC C-TEL 120V, 3H T-SOCK","categoria":"Medidores","stock_sap":4452,"stock_chm":42,"stock_total":4494,"consumo_mensual":1438,"dias_disponibles":94,"estado":"SUFICIENTE"},{"articulo":1004627,"descripcion":"CONDUCT.CONCENTRICOS 3XN6 AWG ALUM.","categoria":"Conductores","stock_sap":324669,"stock_chm":22643,"stock_total":347312,"consumo_mensual":106496,"dias_disponibles":98,"estado":"BAJO"},{"articulo":1004082,"descripcion":"SELLO DOBLE ANCLA COLOR NARANJA","categoria":"Sellos","stock_sap":114761,"stock_chm":3528,"stock_total":118289,"consumo_mensual":21151,"dias_disponibles":168,"estado":"SUFICIENTE"},{"articulo":1004314,"descripcion":"BRIDA DE SUJECION PLASTICA 9 mm X 360 mm","categoria":"Accesorios","stock_sap":5563,"stock_chm":4603,"stock_total":10166,"consumo_mensual":10216,"dias_disponibles":30,"estado":"CRITICO"},{"articulo":1002921,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 8,2 ROSC 1\"","categoria":"Conectores/Bases","stock_sap":21423,"stock_chm":59,"stock_total":21482,"consumo_mensual":3260,"dias_disponibles":198,"estado":"SUFICIENTE"},{"articulo":1002920,"descripcion":"BASE CIRCULAR, ENTRADA DE 1\"","categoria":"Conectores/Bases","stock_sap":40853,"stock_chm":5878,"stock_total":46731,"consumo_mensual":5647,"dias_disponibles":248,"estado":"SUFICIENTE"},{"articulo":1002929,"descripcion":"CONECT A PRUEBA D/AGUA P/C. 6,3 ROSC 1\"","categoria":"Conectores/Bases","stock_sap":20994,"stock_chm":8735,"stock_total":29729,"consumo_mensual":3129,"dias_disponibles":285,"estado":"SUFICIENTE"},{"articulo":1002956,"descripcion":"ARO DE SEGURIDAD CON TORNILLO REFORZADO","categoria":"Accesorios","stock_sap":150292,"stock_chm":6825,"stock_total":157117,"consumo_mensual":14172,"dias_disponibles":333,"estado":"SUFICIENTE"},{"articulo":1004044,"descripcion":"TARUGO PLASTICO DE 3/8’’X 1 1/2’’","categoria":"Accesorios","stock_sap":92128,"stock_chm":16516,"stock_total":108644,"consumo_mensual":8338,"dias_disponibles":391,"estado":"SUFICIENTE"},{"articulo":1008714,"descripcion":"MEDIDOR TELEM PLC 120-240 V, C20  3H T-S","categoria":"Medidores","stock_sap":8451,"stock_chm":124,"stock_total":8575,"consumo_mensual":496,"dias_disponibles":519,"estado":"SUFICIENTE"},{"articulo":1004503,"descripcion":"CONECTOR DE PERFORACION DE FASE","categoria":"Conectores/Bases","stock_sap":126182,"stock_chm":12292,"stock_total":138474,"consumo_mensual":7633,"dias_disponibles":544,"estado":"SUFICIENTE"},{"articulo":1003958,"descripcion":"MEDIDOR 120 V, TELEM PLC 3H T-SOCKET","categoria":"Medidores","stock_sap":389,"stock_chm":0,"stock_total":389,"consumo_mensual":19,"dias_disponibles":611,"estado":"SUFICIENTE"},{"articulo":1003180,"descripcion":"PINZA DE RETENCION DOBLE","categoria":"Accesorios","stock_sap":182452,"stock_chm":7001,"stock_total":189453,"consumo_mensual":7963,"dias_disponibles":714,"estado":"SUFICIENTE"},{"articulo":1014804,"descripcion":"SELLO DE ALTA SEGURIDAD TIPO PIN MARRON","categoria":"Sellos","stock_sap":247419,"stock_chm":30534,"stock_total":277953,"consumo_mensual":10123,"dias_disponibles":824,"estado":"SUFICIENTE"},{"articulo":1003003,"descripcion":"SOPORTE DE ANCLAJE EN FACHADA","categoria":"Accesorios","stock_sap":73417,"stock_chm":8753,"stock_total":82170,"consumo_mensual":1267,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1003243,"descripcion":"TORNILLO TIRAFONDO  1- 4'' X 1 1-2''","categoria":"Accesorios","stock_sap":1943789,"stock_chm":14413,"stock_total":1958202,"consumo_mensual":5591,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004081,"descripcion":"SELLO DOBLE ANCLA COLOR MORADO","categoria":"Sellos","stock_sap":709551,"stock_chm":9816,"stock_total":719367,"consumo_mensual":55,"dias_disponibles":999,"estado":"SUFICIENTE"},{"articulo":1004570,"descripcion":"CONTADOR NETWORK TWACS REPARADO","categoria":"Medidores","stock_sap":438,"stock_chm":0,"stock_total":438,"consumo_mensual":1,"dias_disponibles":999,"estado":"SUFICIENTE"}]},"kit_kpis":{"total":33,"critico":12,"bajo":3,"normal":1,"suficiente":17,"pct_cobertura":55}};
+
+// ── CONSTANTES ──
+const CONSUMO_MIN = 2; // alertas ignoran consumo <= 1
 const KIT_IDS = new Set(D.kit.articulos);
-let fil=[...D.materiales], sk='dias_disponibles', sa=true, CH={}, kitView='alerts';
+const RD='#DC2626',YL='#D97706',GRN='#16A34A',BLU='#2563EB',NV='#0D2B5E',OR='#E8580A';
+const CAT_CLR={'Accesorios':NV,'Conductores':'#0891B2','Conectores/Bases':OR,'Medidores':'#7C3AED','Otros':'#64748B','Sellos':GRN};
 
+let fil=[...D.materiales],sk='dias_disponibles',sa=true;
+let kitFil=[...D.kit.materiales],kitSk='dias_disponibles',kitSa=true;
+let kitView='alerts',CH={};
+
+const TABS={
+  kit:    {title:'Kit de Materiales',sub:'33 artículos esenciales · seguimiento de cobertura'},
+  alertas:{title:'Alertas Críticas',sub:'Materiales con consumo activo (> 1/mes) que requieren atención'},
+  stock:  {title:'Stock General',sub:'Vista por categoría · filtros y búsqueda por material'},
+  exec:   {title:'Resumen Ejecutivo',sub:'Indicadores por categoría · '+D.generado},
+};
+
+// ── UTILS ──
+function clrE(e){return e==='CRITICO'?RD:e==='BAJO'?YL:e==='NORMAL'?BLU:GRN}
+function diasAMeses(d){
+  if(d===0) return '0m';
+  if(d>=999) return '+33m';
+  const m=d/30;
+  if(m<1) return '<1m';
+  return (Math.round(m*10)/10)+'m';
+}
+function fuente(m){
+  const s=m.stock_sap>0,c=m.stock_chm>0;
+  if(s&&c) return 'both';
+  if(s)    return 'sap';
+  if(c)    return 'chm';
+  return 'none';
+}
+function fuenteHTML(m){
+  const f=fuente(m);
+  const lbl={sap:'SAP',chm:'CHM',both:'Ambos',none:'Sin stock'};
+  return `<span class="src-badge src-${f}">${lbl[f]}</span>`;
+}
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(0)+'K';return Math.round(n).toLocaleString()}
+
+// ── NAVEGACIÓN ──
+function goTab(id,el){
+  document.querySelectorAll('.tab-page').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('tb-title').textContent=TABS[id].title;
+  document.getElementById('tb-sub').textContent=TABS[id].sub;
+  if(id==='exec'&&!CH.eCat) renderExecCharts();
+}
+
+// ── STATS POR CATEGORÍA (calculado en JS, no hardcodeado) ──
+function statsPorCat(){
+  const cats={};
+  D.categorias.forEach(c=>{
+    cats[c]={total:0,critico:0,bajo:0,normal:0,suficiente:0,
+             sap_count:0,chm_count:0,both_count:0,none_count:0,
+             cob_dias:[]};
+  });
+  D.materiales.forEach(m=>{
+    const c=cats[m.categoria];
+    if(!c) return;
+    c.total++;
+    c[m.estado.toLowerCase()]=(c[m.estado.toLowerCase()]||0)+1;
+    const f=fuente(m);
+    c[f+'_count']++;
+    if(m.consumo_mensual>1) c.cob_dias.push(m.dias_disponibles);
+  });
+  // cobertura promedio en meses (solo materiales con consumo > 1)
+  Object.values(cats).forEach(c=>{
+    const dias=c.cob_dias.filter(d=>d<999);
+    c.cob_prom_meses = dias.length>0 ? Math.round((dias.reduce((a,b)=>a+b,0)/dias.length)/30*10)/10 : null;
+  });
+  return cats;
+}
+
+// ── INIT ──
 function init(){
-  document.getElementById('upd-lbl').textContent = D.generado;
+  document.getElementById('sb-date').textContent='Actualizado: '+D.generado;
+  document.getElementById('upd-lbl').textContent=D.generado;
+  document.getElementById('tb-sub').textContent=TABS.kit.sub;
+
   const fc=document.getElementById('fc');
-  (D.categorias||[]).forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;fc.appendChild(o)});
-  renderKPIs(); renderKitAlerts(); renderCharts(); renderTable(); renderEBtns();
+  D.categorias.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;fc.appendChild(o);});
+
+  // badges sidebar
+  document.getElementById('nb-kit').textContent=D.kit_kpis.critico;
+  const alertCount=D.materiales.filter(m=>m.consumo_mensual>=CONSUMO_MIN&&(m.estado==='CRITICO'||m.estado==='BAJO')).length;
+  document.getElementById('nb-alertas').textContent=alertCount;
+
+  renderKpiKit(); renderKitChart(); renderKitTable(); renderEBtnsKit();
+  renderKpiAlertas(); renderAlertasList();
+  renderKpiStockCats(); renderEBtnsStock(); renderTable();
+  renderKpiExec();
 }
 
-function renderKPIs(){
-  const k=D.kit;
-  const pct = Math.round(k.suficientes/k.total*100);
-  const kd=[
-    {l:'Materiales en Kit',v:k.total,s:'artículos esenciales',c:''},
-    {l:'Kit Crítico',v:k.criticos,s:'≤ 30 días de cobertura',c:'red'},
-    {l:'Kit con Alerta',v:k.criticos+k.bajos,s:'crítico + bajo',c:'yel'},
-    {l:'Cobertura del Kit',v:pct+'%',s:`${k.suficientes} de ${k.total} suficientes`,c:'grn'},
-  ];
-  document.getElementById('kpis').innerHTML=kd.map(k=>
-    `<div class="kpi ${k.c}">
-      <div class="kpi-lbl">${k.l}</div>
-      <div class="kpi-val">${k.v}</div>
-      <div class="kpi-sub">${k.s}</div>
-    </div>`).join('');
-}
+// ════════ KIT ════════
+function renderKpiKit(){
+  const k=D.kit_kpis;
+  const pct=Math.round((k.suficiente+k.normal)/k.total*100);
+  document.getElementById('kpi-kit').innerHTML=[
+    {l:'Total Kit',v:k.total,s:'artículos esenciales',c:''},
+    {l:'Críticos',v:k.critico,s:'< 1 mes de cobertura',c:'red'},
+    {l:'Con alerta',v:k.critico+k.bajo,s:'crítico + bajo',c:'yel'},
+    {l:'Cobertura OK',v:pct+'%',s:k.suficiente+' suf · '+k.normal+' normales',c:'grn'},
+  ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-lbl">${x.l}</div><div class="kpi-val">${x.v}</div><div class="kpi-sub">${x.s}</div></div>`).join('');
 
-function renderKitAlerts(){
-  const alerta = D.kit.materiales
-    .filter(m=>m.estado==='CRITICO'||m.estado==='BAJO')
-    .sort((a,b)=>a.dias_disponibles-b.dias_disponibles);
-  if(!alerta.length){document.getElementById('kit-alerts-section').innerHTML='';return;}
-  const cr=alerta.filter(m=>m.estado==='CRITICO');
-  const bj=alerta.filter(m=>m.estado==='BAJO');
-  let html=`<div class="sec-title"><span class="dot"></span> Kit — materiales que requieren atención (${alerta.length})</div>
-    <div class="alerts-grid">
-      ${alerta.map(m=>`
-        <div class="alert-card ${m.estado==='BAJO'?'yel':''}">
-          <div class="ac-info">
-            <div class="ac-cod">${m.articulo}</div>
-            <div class="ac-desc" title="${m.descripcion}">${m.descripcion}</div>
-            <div class="ac-meta">Stock: ${m.stock_total.toLocaleString()} &nbsp;·&nbsp; Consumo: ${m.consumo_mensual.toLocaleString()}/mes</div>
-          </div>
-          <div class="ac-dias ${m.estado==='BAJO'?'yel':''}">${m.dias_disponibles}<small> d</small></div>
-        </div>`).join('')}
-    </div>`;
-  document.getElementById('kit-alerts-section').innerHTML=html;
-}
-
-function renderCharts(){
-  const rd='#DC2626',yl='#D97706',grn='#16A34A',blu='#2563EB',nv='#0D2B5E',or='#E8580A';
-  const est=D.por_estado;
-
-  if(CH.e)CH.e.destroy();
-  const eData=[est.SUFICIENTE||0,est.NORMAL||0,est.BAJO||0,est.CRITICO||0];
-  const eLbls=['Suficiente','Normal','Bajo','Crítico'];
-  const eClrs=[grn,blu,yl,rd];
-  document.getElementById('leg-estado').innerHTML=eLbls.map((l,i)=>
-    `<span class="leg-item"><span class="leg-dot" style="background:${eClrs[i]}"></span>${l} ${eData[i]}</span>`).join('');
-  CH.e=new Chart(document.getElementById('ce'),{type:'doughnut',
+  const eLbls=['Suficiente','Normal','Bajo','Crítico'],eClrs=[GRN,BLU,YL,RD];
+  const eData=[k.suficiente,k.normal,k.bajo,k.critico];
+  document.getElementById('leg-kit').innerHTML=eLbls.map((l,i)=>
+    `<span class="leg-item"><span class="leg-dot" style="background:${eClrs[i]}"></span>${l} (${eData[i]})</span>`).join('');
+  if(CH.kitpie) CH.kitpie.destroy();
+  CH.kitpie=new Chart(document.getElementById('ckit-pie'),{type:'doughnut',
     data:{labels:eLbls,datasets:[{data:eData,backgroundColor:eClrs,borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}}}});
 
-  const cat=D.por_categoria, ck=Object.keys(cat).sort((a,b)=>cat[b]-cat[a]);
-  const catClrs=[nv,or,blu,grn,yl,'#7C3AED'];
-  if(CH.c)CH.c.destroy();
-  CH.c=new Chart(document.getElementById('cc'),{type:'bar',
-    data:{labels:ck,datasets:[{data:ck.map(k=>cat[k]),backgroundColor:catClrs,borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{y:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'#F3F4F6'},border:{display:false}},
-              x:{ticks:{font:{size:10}},grid:{display:false},border:{display:false}}}}});
-
-  const zon=D.por_zona, zk=Object.keys(zon).sort((a,b)=>zon[b]-zon[a]);
-  if(CH.z)CH.z.destroy();
-  CH.z=new Chart(document.getElementById('cz'),{type:'bar',
-    data:{labels:zk,datasets:[{data:zk.map(k=>zon[k]),backgroundColor:nv,borderRadius:4,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'#F3F4F6'},border:{display:false}},
-              y:{ticks:{font:{size:10}},grid:{display:false},border:{display:false}}}}});
-
-  renderKitChart();
-
-  const tc=D.materiales.filter(m=>m.consumo_mensual>0).sort((a,b)=>b.consumo_mensual-a.consumo_mensual).slice(0,10);
-  document.getElementById('leg-cons').innerHTML=
-    `<span class="leg-item"><span class="leg-dot" style="background:${nv}"></span>Stock total</span>
-     <span class="leg-item"><span class="leg-dot" style="background:${or}"></span>Consumo/mes</span>`;
-  if(CH.co)CH.co.destroy();
-  CH.co=new Chart(document.getElementById('cco'),{type:'bar',
-    data:{labels:tc.map(m=>m.descripcion.length>18?m.descripcion.substring(0,18)+'…':m.descripcion),
-      datasets:[
-        {label:'Stock',data:tc.map(m=>m.stock_total),backgroundColor:nv+'CC',borderRadius:3,borderSkipped:false},
-        {label:'Consumo',data:tc.map(m=>m.consumo_mensual),backgroundColor:or+'CC',borderRadius:3,borderSkipped:false}
-      ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{y:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'#F3F4F6'},border:{display:false}},
-              x:{ticks:{font:{size:9},maxRotation:35,autoSkip:false},grid:{display:false},border:{display:false}}}}});
+  document.getElementById('kit-progress').innerHTML=`<div class="prog-row">${
+    [['Crítico',k.critico,RD],['Bajo',k.bajo,YL],['Normal',k.normal,BLU],['Suficiente',k.suficiente,GRN]].map(([l,v,c])=>`
+    <div class="prog-item">
+      <span class="prog-lbl">${l}</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(v/k.total*100)}%;background:${c}"></div></div>
+      <span class="prog-val">${v}</span>
+    </div>`).join('')}</div>`;
 }
 
 function renderKitChart(){
-  const rd='#DC2626',yl='#D97706',grn='#16A34A',blu='#2563EB';
-  const all = D.kit.materiales.sort((a,b)=>a.dias_disponibles-b.dias_disponibles);
-  const show = kitView==='alerts' ? all.filter(m=>m.estado==='CRITICO'||m.estado==='BAJO') : all;
-  const h = Math.max(160, show.length * 28 + 40);
-  document.getElementById('kit-chart-wrap').style.height = h+'px';
-  if(CH.kit)CH.kit.destroy();
+  const all=[...D.kit.materiales].sort((a,b)=>a.dias_disponibles-b.dias_disponibles);
+  const show=kitView==='alerts'?all.filter(m=>m.estado==='CRITICO'||m.estado==='BAJO'):all;
+  const h=Math.max(180,show.length*26+40);
+  document.getElementById('kit-chart-wrap').style.height=h+'px';
+  if(CH.kit) CH.kit.destroy();
   CH.kit=new Chart(document.getElementById('ckit'),{type:'bar',
-    data:{labels:show.map(m=>m.descripcion.length>24?m.descripcion.substring(0,24)+'…':m.descripcion),
-      datasets:[{data:show.map(m=>m.dias_disponibles),
-        backgroundColor:show.map(m=>m.estado==='CRITICO'?rd:m.estado==='BAJO'?yl:m.estado==='NORMAL'?blu:grn),
-        borderRadius:3,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{max:Math.max(...show.map(m=>m.dias_disponibles))*1.15||100,
-                 ticks:{font:{size:9}},grid:{color:'#F3F4F6'},border:{display:false}},
-              y:{ticks:{font:{size:10}},grid:{display:false},border:{display:false}}}}});
+    data:{labels:show.map(m=>m.descripcion.length>28?m.descripcion.substring(0,28)+'…':m.descripcion),
+      datasets:[{data:show.map(m=>parseFloat((m.dias_disponibles/30).toFixed(1))),
+        backgroundColor:show.map(m=>clrE(m.estado)),borderRadius:3,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.raw}m`}}},
+      scales:{
+        x:{ticks:{font:{size:9},callback:v=>v+'m'},grid:{color:'#F1F3F7'},border:{display:false}},
+        y:{ticks:{font:{size:10}},grid:{display:false},border:{display:false}}}}});
 }
 
-function setKitView(btn, view){
+function setKitView(btn,view){
   document.querySelectorAll('.k-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  kitView=view;
-  renderKitChart();
+  btn.classList.add('active');kitView=view;renderKitChart();
 }
 
-function renderEBtns(){
+function renderKitTable(){
+  const sorted=[...kitFil].sort((a,b)=>{
+    let va=a[kitSk],vb=b[kitSk];
+    if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase()}
+    return kitSa?(va>vb?1:-1):(va<vb?1:-1);
+  });
+  document.getElementById('tb-kit').innerHTML=sorted.map(m=>{
+    const mVal=parseFloat((m.dias_disponibles/30).toFixed(1));
+    const pct=Math.min(100,Math.round(mVal/4*100));
+    const bc=clrE(m.estado);
+    return `<tr>
+      <td class="tcod">${m.articulo}</td>
+      <td><div class="tdesc" title="${m.descripcion}">${m.descripcion}</div></td>
+      <td><span class="tcat">${m.categoria}</span></td>
+      <td class="tn">${m.stock_sap.toLocaleString()}</td>
+      <td class="tn">${m.stock_chm.toLocaleString()}</td>
+      <td>${fuenteHTML(m)}</td>
+      <td class="tn">${m.consumo_mensual.toLocaleString()}</td>
+      <td><div class="cov-wrap">
+        <div class="cov-bar"><div class="cov-fill" style="width:${pct}%;background:${bc}"></div></div>
+        <span class="cov-val" style="color:${bc}">${diasAMeses(m.dias_disponibles)}</span>
+      </div></td>
+      <td><span class="badge ${m.estado}">${m.estado}</span></td>
+    </tr>`;
+  }).join('');
+}
+function srtKit(k){if(kitSk===k)kitSa=!kitSa;else{kitSk=k;kitSa=true;}renderKitTable();}
+function renderEBtnsKit(){
   const eb=[['Todos',''],['Crítico','ea'],['Bajo','eb'],['Normal','en'],['Suficiente','es']];
-  document.getElementById('ebtns').innerHTML=eb.map(([l,c],i)=>
-    `<button class="e-btn ${i===0?'active':''}" onclick="fByE(this,'${l==='Todos'?'':l.toUpperCase()}')">${l}</button>`).join('');
+  document.getElementById('ebtns-kit').innerHTML=eb.map(([l,c],i)=>
+    `<button class="e-btn ${i===0?'active':''}" onclick="fKit(this,'${l==='Todos'?'':l.toUpperCase()}')">${l}</button>`).join('');
+}
+function fKit(btn,e){
+  document.querySelectorAll('#ebtns-kit .e-btn').forEach(b=>b.classList.remove('active','ea','eb','en','es'));
+  btn.classList.add('active');if(e) btn.classList.add({CRITICO:'ea',BAJO:'eb',NORMAL:'en',SUFICIENTE:'es'}[e]);
+  kitFil=e?D.kit.materiales.filter(m=>m.estado===e):[...D.kit.materiales];renderKitTable();
 }
 
-function fByE(btn,e){
-  document.querySelectorAll('.e-btn').forEach(b=>b.classList.remove('active','ea','eb','en','es'));
-  btn.classList.add('active');
-  if(e==='CRITICO')btn.classList.add('ea');
-  else if(e==='BAJO')btn.classList.add('eb');
-  else if(e==='NORMAL')btn.classList.add('en');
-  else if(e==='SUFICIENTE')btn.classList.add('es');
-  document.getElementById('fst').value=e;
+// ════════ ALERTAS ════════
+function renderKpiAlertas(){
+  const lista=D.materiales.filter(m=>m.consumo_mensual>=CONSUMO_MIN&&(m.estado==='CRITICO'||m.estado==='BAJO'));
+  const cr=lista.filter(m=>m.estado==='CRITICO').length;
+  const bj=lista.filter(m=>m.estado==='BAJO').length;
+  document.getElementById('kpi-alertas').innerHTML=[
+    {l:'Total alertas',v:cr+bj,s:'consumo activo · acción requerida',c:'red'},
+    {l:'Críticos',v:cr,s:'< 1 mes · atención inmediata',c:'red'},
+    {l:'Bajos',v:bj,s:'1 – 2 meses · monitorear',c:'yel'},
+  ].map(x=>`<div class="kpi ${x.c}"><div class="kpi-lbl">${x.l}</div><div class="kpi-val">${x.v}</div><div class="kpi-sub">${x.s}</div></div>`).join('');
+}
+
+function renderAlertasList(){
+  const lista=D.materiales
+    .filter(m=>m.consumo_mensual>=CONSUMO_MIN&&(m.estado==='CRITICO'||m.estado==='BAJO'))
+    .sort((a,b)=>a.dias_disponibles-b.dias_disponibles);
+  const cr=lista.filter(m=>m.estado==='CRITICO').length;
+  const bj=lista.filter(m=>m.estado==='BAJO').length;
+  document.getElementById('alerta-title').innerHTML=
+    `<span class="dot"></span> ${lista.length} materiales — ${cr} críticos · ${bj} bajos · consumo > 1/mes`;
+
+  document.getElementById('alertas-list').innerHTML=`<div class="alerts-list">${
+    lista.map(m=>{
+      const isCr=m.estado==='CRITICO', cls=isCr?'cr':'bj';
+      const isKit=KIT_IDS.has(m.articulo);
+      const meses=diasAMeses(m.dias_disponibles);
+      return `<div class="alert-row ${cls}">
+        <div class="ar-cov">
+          <div class="ar-mes ${cls}">${meses}</div>
+          <div class="ar-mlbl">cobertura</div>
+        </div>
+        <div class="ar-info">
+          <div class="ar-cod">${isKit?'<span class="kit-dot"></span>':''}${m.articulo} · ${m.categoria}</div>
+          <div class="ar-desc">${m.descripcion}</div>
+          <div class="ar-meta">Stock SAP: ${m.stock_sap.toLocaleString()} &nbsp;·&nbsp; CHM: ${m.stock_chm.toLocaleString()} &nbsp;·&nbsp; Consumo: ${m.consumo_mensual.toLocaleString()}/mes</div>
+        </div>
+        <div class="ar-right">
+          <span class="badge ${m.estado}">${m.estado}</span>
+          ${fuenteHTML(m)}
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+// ════════ STOCK GENERAL ════════
+function renderKpiStockCats(){
+  const stats=statsPorCat();
+  // KPIs: una tarjeta por categoría mostrando críticos y cobertura promedio
+  document.getElementById('kpi-stock-cats').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px">
+      ${D.categorias.map(cat=>{
+        const s=stats[cat], clr=CAT_CLR[cat]||NV;
+        const cr=s.critico||0, tot=s.total;
+        const cobStr=s.cob_prom_meses!=null?(s.cob_prom_meses+'m'):'–';
+        const pctCr=tot>0?Math.round(cr/tot*100):0;
+        return `<div class="kpi" style="--ac:${clr};cursor:pointer" onclick="filtrarCat('${cat}')">
+          <div class="kpi-lbl">${cat}</div>
+          <div style="font-size:18px;font-weight:600;font-family:var(--mono);line-height:1;margin-bottom:4px">${tot}</div>
+          <div style="font-size:10px;color:var(--lx)">
+            ${cr>0?`<span style="color:var(--red);font-weight:600">${cr} críticos</span>`:'<span style="color:var(--grn)">Sin críticos</span>'}
+            &nbsp;·&nbsp; Cob. prom: ${cobStr}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function filtrarCat(cat){
+  document.getElementById('fc').value=cat;
   applyF();
+  document.getElementById('stock-table-title').textContent=cat;
+}
+
+function renderEBtnsStock(){
+  const eb=[['Todos',''],['Crítico','ea'],['Bajo','eb'],['Normal','en'],['Suficiente','es']];
+  document.getElementById('ebtns-stock').innerHTML=eb.map(([l,c],i)=>
+    `<button class="e-btn ${i===0?'active':''}" onclick="fByE(this,'${l==='Todos'?'':l.toUpperCase()}')">${l}</button>`).join('');
 }
 
 function renderTable(){
@@ -391,10 +596,10 @@ function renderTable(){
     return sa?(va>vb?1:-1):(va<vb?1:-1);
   });
   document.getElementById('fcnt').textContent=sorted.length+' materiales';
-  const rd='#DC2626',yl='#D97706',grn='#16A34A',blu='#2563EB';
   document.getElementById('tb').innerHTML=sorted.map(m=>{
-    const pct=Math.min(100,Math.round(m.dias_disponibles/365*100));
-    const bc=m.estado==='CRITICO'?rd:m.estado==='BAJO'?yl:m.estado==='NORMAL'?blu:grn;
+    const mVal=parseFloat((m.dias_disponibles/30).toFixed(1));
+    const pct=Math.min(100,Math.round(mVal/4*100));
+    const bc=clrE(m.estado);
     const isKit=KIT_IDS.has(m.articulo);
     return `<tr>
       <td class="tcod">${isKit?'<span class="kit-dot"></span>':''}${m.articulo}</td>
@@ -402,14 +607,12 @@ function renderTable(){
       <td><span class="tcat">${m.categoria}</span></td>
       <td class="tn">${m.stock_sap.toLocaleString()}</td>
       <td class="tn">${m.stock_chm.toLocaleString()}</td>
-      <td class="tn" style="font-weight:500">${m.stock_total.toLocaleString()}</td>
+      <td>${fuenteHTML(m)}</td>
       <td class="tn">${m.consumo_mensual.toLocaleString()}</td>
-      <td>
-        <div class="cov-wrap">
-          <div class="cov-bar"><div class="cov-fill" style="width:${pct}%;background:${bc}"></div></div>
-          <span class="cov-val" style="color:${bc}">${m.dias_disponibles}d</span>
-        </div>
-      </td>
+      <td><div class="cov-wrap">
+        <div class="cov-bar"><div class="cov-fill" style="width:${pct}%;background:${bc}"></div></div>
+        <span class="cov-val" style="color:${bc}">${diasAMeses(m.dias_disponibles)}</span>
+      </div></td>
       <td><span class="badge ${m.estado}">${m.estado}</span></td>
     </tr>`;
   }).join('');
@@ -420,33 +623,98 @@ function srt(k){if(sk===k)sa=!sa;else{sk=k;sa=true;}renderTable();}
 function applyF(){
   const cat=document.getElementById('fc').value;
   const est=document.getElementById('fst').value;
+  const src=document.getElementById('fsrc').value;
   const kit=document.getElementById('fkit').value;
   const srch=document.getElementById('fsrch').value.toLowerCase();
   fil=D.materiales.filter(m=>{
-    if(est&&m.estado!==est)return false;
-    if(cat&&m.categoria!==cat)return false;
-    if(kit==='kit'&&!KIT_IDS.has(m.articulo))return false;
-    if(kit==='otros'&&KIT_IDS.has(m.articulo))return false;
-    if(srch&&!m.descripcion.toLowerCase().includes(srch)&&!String(m.articulo).includes(srch))return false;
+    if(est&&m.estado!==est) return false;
+    if(cat&&m.categoria!==cat) return false;
+    if(kit==='kit'&&!KIT_IDS.has(m.articulo)) return false;
+    if(kit==='otros'&&KIT_IDS.has(m.articulo)) return false;
+    if(src){const f=fuente(m);if(f!==src)return false;}
+    if(srch&&!m.descripcion.toLowerCase().includes(srch)&&!String(m.articulo).includes(srch)) return false;
     return true;
   });
+  const cat2=document.getElementById('fc').value;
+  document.getElementById('stock-table-title').textContent=cat2||'Todos los materiales';
   renderTable();
 }
 
 function clrF(){
-  ['fc','fst','fkit'].forEach(id=>document.getElementById(id).value='');
+  ['fc','fst','fsrc','fkit'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fsrch').value='';
-  fil=[...D.materiales];
-  renderEBtns();renderTable();
+  document.getElementById('stock-table-title').textContent='Todos los materiales';
+  fil=[...D.materiales];renderEBtnsStock();renderTable();
 }
 
-function toggleUp(){document.getElementById('fp').classList.toggle('open');}
-document.addEventListener('click',e=>{if(!e.target.closest('.hdr-r'))document.getElementById('fp').classList.remove('open');});
+function fByE(btn,e){
+  document.querySelectorAll('#ebtns-stock .e-btn').forEach(b=>b.classList.remove('active','ea','eb','en','es'));
+  btn.classList.add('active');
+  if(e) btn.classList.add({CRITICO:'ea',BAJO:'eb',NORMAL:'en',SUFICIENTE:'es'}[e]);
+  document.getElementById('fst').value=e;applyF();
+}
 
-function fmt(n){
-  if(n>=1000000)return(n/1000000).toFixed(1)+'M';
-  if(n>=1000)return(n/1000).toFixed(1)+'K';
-  return Math.round(n).toLocaleString();
+// ════════ EJECUTIVO ════════
+function renderKpiExec(){
+  // Solo renderiza las tarjetas de categoría — sin sumas mezcladas
+  // Las tarjetas del ejecutivo las genera renderExecCharts cuando se abre la pestaña
+}
+
+function renderExecCharts(){
+  const stats=statsPorCat();
+  const cats=D.categorias;
+  const clrs=cats.map(c=>CAT_CLR[c]||NV);
+
+  // Gráfico apilado: estado por categoría
+  if(CH.eCat) CH.eCat.destroy();
+  CH.eCat=new Chart(document.getElementById('ce-cat'),{type:'bar',
+    data:{labels:cats,datasets:[
+      {label:'Crítico',data:cats.map(c=>stats[c].critico||0),backgroundColor:RD,borderRadius:2,borderSkipped:false},
+      {label:'Bajo',data:cats.map(c=>stats[c].bajo||0),backgroundColor:YL,borderRadius:0,borderSkipped:false},
+      {label:'Normal',data:cats.map(c=>stats[c].normal||0),backgroundColor:BLU,borderRadius:0,borderSkipped:false},
+      {label:'Suficiente',data:cats.map(c=>stats[c].suficiente||0),backgroundColor:GRN+'99',borderRadius:0,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10}}},
+      scales:{x:{stacked:true,ticks:{font:{size:10}},grid:{display:false},border:{display:false}},
+              y:{stacked:true,ticks:{font:{size:10}},grid:{color:'#F1F3F7'},border:{display:false}}}}});
+
+  // Cobertura promedio por categoría en meses
+  const cobData=cats.map(c=>stats[c].cob_prom_meses||0);
+  if(CH.cCov) CH.cCov.destroy();
+  CH.cCov=new Chart(document.getElementById('cc-cov'),{type:'bar',
+    data:{labels:cats,datasets:[{data:cobData,backgroundColor:clrs,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.raw}m promedio`}}},
+      scales:{
+        x:{ticks:{font:{size:10}},grid:{display:false},border:{display:false}},
+        y:{ticks:{font:{size:10},callback:v=>v+'m'},grid:{color:'#F1F3F7'},border:{display:false}}}}});
+
+  // SAP vs CHM por categoría — cantidad de materiales en cada fuente
+  const sapData=cats.map(c=>(stats[c].sap_count||0)+(stats[c].both_count||0));
+  const chmData=cats.map(c=>(stats[c].chm_count||0)+(stats[c].both_count||0));
+  if(CH.cSrc) CH.cSrc.destroy();
+  CH.cSrc=new Chart(document.getElementById('cc-src'),{type:'bar',
+    data:{labels:cats,datasets:[
+      {label:'SAP',data:sapData,backgroundColor:NV+'CC',borderRadius:3,borderSkipped:false},
+      {label:'CHM',data:chmData,backgroundColor:GRN+'99',borderRadius:3,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10}}},
+      scales:{
+        x:{ticks:{font:{size:10}},grid:{display:false},border:{display:false}},
+        y:{ticks:{font:{size:10}},grid:{color:'#F1F3F7'},border:{display:false}}}}});
+
+  // Doughnut general
+  const est=D.por_estado;
+  const eData=[est.SUFICIENTE||0,est.NORMAL||0,est.BAJO||0,est.CRITICO||0];
+  const eLbls=['Suficiente','Normal','Bajo','Crítico'];
+  const eClrs=[GRN,BLU,YL,RD];
+  document.getElementById('leg-estado').innerHTML=eLbls.map((l,i)=>
+    `<span class="leg-item"><span class="leg-dot" style="background:${eClrs[i]}"></span>${l} (${eData[i]})</span>`).join('');
+  if(CH.e) CH.e.destroy();
+  CH.e=new Chart(document.getElementById('ce'),{type:'doughnut',
+    data:{labels:eLbls,datasets:[{data:eData,backgroundColor:eClrs,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
 }
 
 init();
